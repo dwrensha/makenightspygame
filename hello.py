@@ -37,7 +37,7 @@ def greet():
 	return "hello"
 
 
-@app.route('send', methods=['GET'])
+@app.route('/send', methods=['GET'])
 def sendToRecipient():
 	try:
 		message = twilioclient.sms.messages.create(body="hello", to=mynumber, from_=twilionumber)
