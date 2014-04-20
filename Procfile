@@ -1,1 +1,1 @@
-web: gunicorn cocktails:app
+web: gunicorn test:app
