@@ -38,6 +38,7 @@ def lookup(collection, field, fieldvalue, response):
 	# (if more than one thing is possible, look it up manually)
 
 # ----------- Game --------------
+# "leaving" removes the player from active status
 # A message containing just a number from a previously unknown phoneNumber should cause the creation of new agent at that phoneNumber with the content as their agentNumber.
 # A message containing just a number from a known phoneNumber should check if the number in the content is the number of an agent friendly to the sender.
 # A message containing a number and a word from a known phoneNumber should check if the number and word in the content correspond to an enemy agent.
@@ -86,20 +87,28 @@ def newAgent(phoneNumber, content):
 		"words": wordlist,
 		"successfulContacts":[],
 		"interceptedTransmits":[],
-		"reportedEnemies":[],
+		"reportedEnemyCodes":[],
 		"spuriousReports":[],
 		"points": 0
 		})
 	success = sendMessage(agentNumber, "welcome [wordlist here]")
 	return success
 
-# Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both and assign points.  If not, warn the reportingAgent and demerit them.
+# Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend):
-	if isFriend:
+	reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
+	potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="wordlist")
+	if reportingAgentList is potentialFriendList:
 		message(reportingAgent, "Correct!")
+		addToRecord(reportingAgent, "successfulContacts", potentialFriend)
+		awardPoints(reportingAgent, 10)
+		addToRecord(potentialFriend, "successfulContacts", reportingAgent)
+		awardPoints(potentialFriend, 10)
+		return True
 	else:
 		message(reportingAgent, "Wrong!")
-	return isFriend
+		awardPoints(reportingAgent, -3)
+		return False
 
 # Check if the suspiciousWord is on the potentialEnemy's wordlist but not the reportingAgent's.  If so, congratulate reportingAgent. If not, chide reportingAgent.  Assign points accordingly.
 def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
@@ -108,14 +117,18 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 	if suspiciousWord in potentialEnemyList:
 		if not suspiciousWord in reportingAgentList:
 			sendMessage(reportingAgent, "congratulations for useful info")
+			addToRecord(reportingAgent, "reportedEnemyCodes", suspiciousWord)
 			awardPoints(reportingAgent, 10)
+			addToRecord(potentialEnemy, "interceptedTransmits", suspiciousWord)
 			awardPoints(potentialEnemy, -10)
 			return True
 		else:
 			sendMessage(reportingAgent, "doesn't that word look familiar to you?")
+			addToRecord(reportingAgent, "spuriousReports", suspiciousWord)
 			return False
 	else:
 		spuriousReport(suspiciousWord)
+		addToRecord(reportingAgent, "spuriousReports", suspiciousWord)
 		sendMessage(reportingAgent, "we have no such record, be more careful")
 		awardPoints(reportingAgent, -3)
 		return False
@@ -138,12 +151,18 @@ def transcript(recipient, content):
 	time = datetime.datetime.now()
 	transcript.insert({"time":time, "recipient":recipient, "content":content})
 
+# Append to a player's record list (any of "successfulContacts", "interceptedTransmits", "reportedEnemies", or "spuriousReports")
+def addToRecord(agentNumber, field, content):
+	players.update({"agentNumber":agentNumber}, {"$push":{field:content}})
+	return
+
 # get their points, modify, put them back in the database
 def awardPoints(agentNumber, numberofPoints):
 	return
 
-# Put a spurious word into the game's record of spurious reports.
+# Append a spurious word onto the game's record of spurious reports.
 def spuriousReport(suspiciousWord):
+	games.update({"active":"True"}, {"$push":{"spuriousReports":suspiciousWord}})
 	return
 
 # ----------- Web --------------
