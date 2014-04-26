@@ -31,11 +31,40 @@ transcript = database["transcript"]
 games = database["games"]
 
 
+def gameLogic(fromnumber, content):
+	check if existing player(fromnumber), return playerNumber
+	if false, make newAgent(phonenumber)
+	if yes, parse content
+	if parser fail, send "huh?" message
+	if content has just a number, report friend (reportingAgent, potentialFriend)
+	if content has word and number, report enemy (accuser, accusee, codeword)
+
+def checkAgentNumber(phonenumber):
+	return agentNumber
+
+def newAgent(phonenumber):
+	return True
+
+def reportFriend(reportingAgent, potentialFriend):
+	if isFriend:
+		message(reportingAgent, "Correct!")
+	else:
+		message(reportingAgent, "Wrong!")
+	return isFriend
+
+def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
+	if isEnemy:
+		message(reportingAgent, "Correct!")
+	else:
+		message(reportingAgent, "Wrong!")
+	return isEnemy
+
+def transcript(content):
+	add thing to transcript
 
 @app.route('/', methods=['GET'])
 def greet():
 	return "hello"
-
 
 @app.route('/send', methods=['GET'])
 def sendToRecipient():
@@ -44,3 +73,13 @@ def sendToRecipient():
  	except twilio.TwilioRestException as e:
  		print "twilio error: "+e
  	return "sent message"
+
+
+@app.route('/twilio', methods=['POST'])
+def incomingSMS():
+	fromnumber = request.form.get('From', None)
+	content = request.form.get('Body', None)
+	if fromnumber and content:
+		gameLogic(fromnumber, content)
+		return "Success!"
+	else return "Eh?"
