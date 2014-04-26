@@ -156,8 +156,9 @@ def addToRecord(agentNumber, field, content):
 	players.update({"agentNumber":agentNumber}, {"$push":{field:content}})
 	return
 
-# get their points, modify, put them back in the database
-def awardPoints(agentNumber, numberofPoints):
+# Increments player's points by pointAdjustment
+def awardPoints(agentNumber, pointAdjustment):
+	players.update({"agentNumber":agentNumber}, {"$inc":{"points":pointAdjustment}})
 	return
 
 # Append a spurious word onto the game's record of spurious reports.
