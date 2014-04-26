@@ -25,27 +25,57 @@ databasename = mongoclientURL.split("/")[-1] #gets the last bit of the URL, whic
 # Init Mongo
 mongoclient = MongoClient(mongoclientURL)
 database = mongoclient[databasename]	#loads the assigned database
-# collection = database["phonenumber"] #loads or makes the collection, whichever should happen
+# collection = database["phoneNumber"] #loads or makes the collection, whichever should happen
 players = database["players"]
 transcript = database["transcript"]
 games = database["games"]
 
+# ----------- Helpers --------------
+def lookup(collection, field, fieldvalue, response):
+	return collection.find({field:fieldvalue}, {response:1, "_id":0})[0][response] 
+	# "find" returns an array of objects; the first one ought to be the one we want
+	# (if more than one thing is possible, look it up manually)
+
 # ----------- Game --------------
-def gameLogic(fromnumber, content):
-	check if existing player(fromnumber), return playerNumber
-	if false, make newAgent(phonenumber)
-	if yes, parse content
-	if parser fail, send "huh?" message
-	if content has just a number, report friend (reportingAgent, potentialFriend)
-	if content has word and number, report enemy (accuser, accusee, codeword)
+def gameLogic(phoneNumber, content):
+	agentNumber = getAgentNumber(phoneNumber)
+	if not agentNumber:
+		newAgent(phoneNumber, content)
+	else:
+		if yes, parse content
+		if parser fail, send "huh?" message
+		if content has just a number, report friend (reportingAgent, potentialFriend)
+		if content has word and number, report enemy (accuser, accusee, codeword)
 
 def getAgentNumber(phoneNumber):
+	if players.find({"phoneNumber": phoneNumber}).count() == 0:
+		agentNumber = False
+	else:
+		agentNumber = lookup(collection=players, field="phoneNumber", fieldvalue=phoneNumber, response="agentNumber")
 	return agentNumber
 
 def getPhoneNumber(agentNumber):
 	return phoneNumber
 
-def newAgent(phonenumber):
+def assignWords():
+	wordlists = lookup(collection=games, field="status", fieldvalue="active", response="wordlists")
+	wordlist = random.choice(wordlists)
+	return wordlist
+
+def newAgent(phoneNumber, content):
+	agentNumber = content
+	wordlist = assignWords()
+	players.insert({
+		"agentNumber": agentNumber,
+		"phoneNumber": phoneNumber,
+		"active": "True",
+		"words": wordlist,
+		"successfulContacts":[],
+		"interceptedTransmits":[],
+		"reportedEnemies":[],
+		"spuriousReports":[],
+		})
+	sendMessage(agentNumber, "welcome!")
 	return True
 
 def reportFriend(reportingAgent, potentialFriend):
@@ -63,13 +93,13 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 	return isEnemy
 
 
-def sendMessage(recipient, content):
-	phoneNumber = getPhoneNumber(recipient)
+def sendMessage(agentNumber, content):
+	phoneNumber = getPhoneNumber(agentNumber)
 	try:
 		message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=twilionumber)
  	except twilio.TwilioRestException as e:
- 		content = content + " / TWILIO ERROR: " + e
-	transcript(recipient, content)
+ 		content = content + " WITH TWILIO ERROR: " + e
+	transcript(agentNumber, content)
 	return True
 
 def transcript(recipient, content):
@@ -84,9 +114,9 @@ def greet():
 
 @app.route('/twilio', methods=['POST'])
 def incomingSMS():
-	fromnumber = request.form.get('From', None)
+	phoneNumber = request.form.get('From', None)
 	content = request.form.get('Body', None)
-	if fromnumber and content:
-		gameLogic(fromnumber, content)
+	if phoneNumber and content:
+		gameLogic(phoneNumber, content)
 		return "Success!"
 	else return "Eh?"
