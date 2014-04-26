@@ -10,7 +10,7 @@ import re
 debug = False
 app = Flask(__name__)
 
-
+# ----------- Setup --------------
 # Twilio account info, to be gotten from Heroku environment variables
 account_sid = os.environ['ACCOUNT_SID'] 
 auth_token = os.environ['AUTH_TOKEN']
@@ -30,7 +30,7 @@ players = database["players"]
 transcript = database["transcript"]
 games = database["games"]
 
-
+# ----------- Game --------------
 def gameLogic(fromnumber, content):
 	check if existing player(fromnumber), return playerNumber
 	if false, make newAgent(phonenumber)
@@ -39,8 +39,11 @@ def gameLogic(fromnumber, content):
 	if content has just a number, report friend (reportingAgent, potentialFriend)
 	if content has word and number, report enemy (accuser, accusee, codeword)
 
-def checkAgentNumber(phonenumber):
+def getAgentNumber(phoneNumber):
 	return agentNumber
+
+def getPhoneNumber(agentNumber):
+	return phoneNumber
 
 def newAgent(phonenumber):
 	return True
@@ -59,21 +62,25 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 		message(reportingAgent, "Wrong!")
 	return isEnemy
 
-def transcript(content):
-	add thing to transcript
+
+def sendMessage(recipient, content):
+	phoneNumber = getPhoneNumber(recipient)
+	try:
+		message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=twilionumber)
+ 	except twilio.TwilioRestException as e:
+ 		content = content + " / TWILIO ERROR: " + e
+	transcript(recipient, content)
+	return True
+
+def transcript(recipient, content):
+	time = datetime.datetime.now()
+	transcript.insert({"time":time, "recipient":recipient, "content":content})
+
+# ----------- Web --------------
 
 @app.route('/', methods=['GET'])
 def greet():
-	return "hello"
-
-@app.route('/send', methods=['GET'])
-def sendToRecipient():
-	try:
-		message = twilioclient.sms.messages.create(body="hello", to=mynumber, from_=twilionumber)
- 	except twilio.TwilioRestException as e:
- 		print "twilio error: "+e
- 	return "sent message"
-
+	return "nothing to see here"
 
 @app.route('/twilio', methods=['POST'])
 def incomingSMS():
