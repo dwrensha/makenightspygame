@@ -1,0 +1,7 @@
+<ul style="list-style-type:none">
+{% for post in information.find() %}
+  <li class="{{ post.tag }}">{{ post.time|printtime }}: "{{ post.content }}"</li>
+{% endfor %}
+</ul>
+
+
