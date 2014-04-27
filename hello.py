@@ -259,6 +259,9 @@ def leaderboard():
 	spuriousList = lookup(games, "active", "True", "spuriousReports")
 	return render_template("leaderboard.html", players = players, spuriousReports = spuriousList)
 
+@app.route('/leatranscript', methods=['GET'])
+def transcript():
+	return render_template("transcript.html", information = transcript)
 
 #----------Jinja filter-------------------------------------------
 @app.template_filter('printtime')
@@ -270,6 +273,3 @@ def timeToString(timestamp):
 
 if __name__ == "__main__":
 	app.run(debug=debug)
-
-
-# don't allow more than one report of the same word/enemy or more than one report of same friendly contact
