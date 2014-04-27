@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <title>Transcript</title>
+    <style type="text/css">
+    .newagent {
+    	color:#cccccc;
+    }
+    .agentretired {
+    	color:#cccccc;
+    }
+    .parsererror {
+    	background-color: #ff0000;
+    	color:#ffffff;
+    }
+    .successfulcontact {
+    	color:#0000ff;
+    }
+    .incorrectcontact {
+    	color:#cccccc;
+    }
+    .interceptedtransmit {
+    	color:#ccffcc;
+    }
+    .spuriousreport {
+    	color:#ff00ff;
+    }
+    .sentmessage {
+    	color:#666666;
+    }
+    </style>
+</head>
+<body>
+
+<ul style="list-style-type:none">
+{% for post in information.find() %}
+  <li class="{{ post.tag }}">{{ post.time|printtime }}: "{{ post.content }}"</li>
+{% endfor %}
+</ul>
+
+
+</body>
+</html>
