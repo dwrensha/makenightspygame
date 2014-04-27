@@ -56,7 +56,7 @@ def gameLogic(phoneNumber, rawcontent):
 	if not agentNumber:
 		newAgent(phoneNumber, rawcontent)
 		return
-	# recognized number takes a game ation
+	# recognized number goes on to be treated as a game action
 	else:
 		# "leaving" removes the player from active status
 		if re.match("leaving", rawcontent.lower()):
@@ -64,16 +64,26 @@ def gameLogic(phoneNumber, rawcontent):
 		else:
 			# chop rawcontent into a list of lowercase words, separating on whitespace and punctuation
 			content = re.split('\W+', rawcontent.lower())
+			# if there's only one word, treat it as a potential report of friendly contact
 			if len(content) == 1:
 				if isAgentNumber(content[0]):
 					reportFriend(agentNumber, content[0])
 				else:
-					sendHelpMessage(agentNumber)
+					parserError(agentNumber, rawcontent)
+			# otherwise, treat it as a potential enemy intelligence report (one agent name, one suspicious word)
 			else:
-				if yes, parse content
-				if parser fail, send "huh?" message
-				if content has just a number, report friend (reportingAgent, potentialFriend)
-				if content has word and number, report enemy (accuser, accusee, codeword)
+				accusee = None
+				for i in range(len(content)):
+					# if any of the words is an agent number, pull it out and store it as the accusee
+					if isAgentNumber(content[i]):
+						accusee = content.pop(i)
+				if accusee:
+					if len(content) == 1:
+						reportEnemy(agentNumber, accusee, content[0])
+					else:
+						sendMessage(agentNumber, "whoa there one word at a time")
+				else:
+					parserError(agentNumber)
 
 def getAgentNumber(phoneNumber):
 	# first check if it's a known phoneNumber
@@ -97,33 +107,39 @@ def assignWords():
 	return wordlist
 
 # Assign the new agent their wordlist, enter them into the database, and message them their list.
-# (Don't try to message them before they're in the DB!)
+# (Don't try to use sendMessage with an agentNumber before they're in the DB!)
 def newAgent(phoneNumber, rawcontent):
 	content = re.split('\W+', rawcontent.lower())
 	agentNumber = content[0]
-	wordlist = assignWords()
-	players.insert({
-		"agentNumber": agentNumber,
-		"phoneNumber": phoneNumber,
-		"active": "True",
-		"words": wordlist,
-		"successfulContacts":[],
-		"interceptedTransmits":[],
-		"reportedEnemyCodes":[],
-		"spuriousReports":[],
-		"points": 0
-		})
-	success = sendMessage(agentNumber, "welcome [wordlist here]")
-	# add initial message to transcript
-	return success
+	if checkFor(players, "agentNumber", agentNumber):
+		sendMessage(agentNumber=None, content="That number seems to be taken. Please see Q to sort things out.", phoneNumber=phoneNumber)
+		return
+	else:
+		wordlist = assignWords()
+		players.insert({
+			"agentNumber": agentNumber,
+			"phoneNumber": phoneNumber,
+			"active": "True",
+			"words": wordlist,
+			"successfulContacts":[],
+			"interceptedTransmits":[],
+			"reportedEnemyCodes":[],
+			"spuriousReports":[],
+			"points": 0
+			})
+		success = sendMessage(agentNumber, "welcome [wordlist here]")
+		transcript(content="New agent: "+agentNumber, tag="newagent")
+		return
 
 def retireAgent(agentNumber):
 	players.update({"agentNumber":agentNumber}, {"$set":{"active":"False"}})
+	transcript(content="Agent retired: "+agentNumber, tag="agentretired")
 	sendMessage(agentNumber, "Good work and goodnight, Agent "+agentNumber+"!")
 	return
 
-def sendHelpMessage(agentNumber):
-	sendMessage(agentNumber, "Pardon? Visit Q if you need help.")
+def parserError(agentNumber, rawcontent):
+	transcript(content="Agent "+agentNumber+" sent unparseable content: "+rawcontent, tag="parsererror")
+	sendMessage(agentNumber, "Pardon? Visit Q if you need help forming reports.")
 
 # Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend):
@@ -134,6 +150,7 @@ def reportFriend(reportingAgent, potentialFriend):
 		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="wordlist")
 
 		if reportingAgentList is potentialFriendList:
+			transcript(content="Agents "+reportingAgent+" and "+potentialFriend+" successfully made contact.", tag="successfulcontact")
 			message(reportingAgent, "Correct!")
 			addToRecord(reportingAgent, "successfulContacts", potentialFriend)
 			awardPoints(reportingAgent, 10)
@@ -141,6 +158,7 @@ def reportFriend(reportingAgent, potentialFriend):
 			awardPoints(potentialFriend, 10)
 			return True
 		else:
+			transcript(content="Agent "+reportingAgent+" incorrectly reported friendly contact with Agent "+potentialFriend, tag="incorrectcontact")
 			message(reportingAgent, "Wrong!")
 			awardPoints(reportingAgent, -3)
 			return False
@@ -160,35 +178,39 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 				awardPoints(reportingAgent, 10)
 				addToRecord(potentialEnemy, "interceptedTransmits", suspiciousWord)
 				awardPoints(potentialEnemy, -10)
+				transcript(content="Agent "+reportingAgent+" caught Agent "+potentialEnemy+" transmitting code: "+suspiciousWord, tag="interceptedtransmit")
 				return True
 			else:
 				sendMessage(reportingAgent, "doesn't that word look familiar to you?")
 				addToRecord(reportingAgent, "spuriousReports", suspiciousWord)
+				transcript(content="Agent "+reportingAgent+" reported Agent "+potentialEnemy+" for the code: "+suspiciousWord+"but that was their own word too.", tag="interceptedfriendlytransmit")
 				return False
 		else:
 			spuriousReport(suspiciousWord)
 			addToRecord(reportingAgent, "spuriousReports", suspiciousWord)
 			sendMessage(reportingAgent, "we have no such record, be more careful")
 			awardPoints(reportingAgent, -3)
+			transcript(content="Agent "+reportingAgent+" spuriously reported Agent "+potentialEnemy+" for the code: "+suspiciousWord, tag="spuriousreport")
 			return False
 
 
 # Send a message to an agent based on their agentNumber (not phoneNumber)
-def sendMessage(agentNumber, content):
-	phoneNumber = getPhoneNumber(agentNumber)
+def sendMessage(agentNumber, content, phoneNumber=None):
+	if agentNumber and not phoneNumber:
+		phoneNumber = getPhoneNumber(agentNumber)
 	if phoneNumber:
 		try:
 			message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=twilionumber)
 	 	except twilio.TwilioRestException as e:
 	 		content = content + " WITH TWILIO ERROR: " + e
-		transcript(agentNumber, content)
+		transcript(content="Sent message to "+agentNumber+": "+content, tag="sentmessage")
 		return True
 	else:
 		return False
 
-def transcript(recipient, content):
+def transcript(content, tag):
 	time = datetime.datetime.now()
-	transcript.insert({"time":time, "recipient":recipient, "content":content})
+	transcript.insert({"time":time, "tag":tag, "content":content})
 
 # Append to a player's record list (any of "successfulContacts", "interceptedTransmits", "reportedEnemies", or "spuriousReports")
 def addToRecord(agentNumber, field, content):
@@ -219,3 +241,9 @@ def incomingSMS():
 		gameLogic(phoneNumber, content)
 		return "Success!"
 	else return "Eh?"
+
+
+# Cases to handle: unknown number texts in with an existing agent's number
+# don't allow more than one report of the same word/enemy or more than one report of same friendly contact
+# transcript shows: new agents joining, accusations/contacts, spurious reports, agents leaving
+# (css in transcript distinguishes between events, class=eventtype)
