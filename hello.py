@@ -178,30 +178,32 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 	else:
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
 		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="wordlist")
-		if suspiciousWord in potentialEnemyList:
+		previouslyReportedList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="reportedEnemyCodes")
+		if potentialEnemy+" "+suspiciousWord in previouslyReportedList:
+			sendMessage(reportingAgent, "you already sent us that")
+		elif suspiciousWord in potentialEnemyList:
 			if not suspiciousWord in reportingAgentList:
 				sendMessage(reportingAgent, "congratulations for useful info")
-				addToRecord(reportingAgent, "reportedEnemyCodes", suspiciousWord)
+				addToRecord(reportingAgent, "reportedEnemyCodes", potentialEnemy+" "+suspiciousWord)
 				awardPoints(reportingAgent, 10)
-				addToRecord(potentialEnemy, "interceptedTransmits", suspiciousWord)
+				addToRecord(potentialEnemy, "interceptedTransmits", reportingAgent+" "+suspiciousWord)
 				awardPoints(potentialEnemy, -10)
 				transcript(content="Agent "+reportingAgent+" caught Agent "+potentialEnemy+" transmitting code: "+suspiciousWord, tag="interceptedtransmit")
 				return True
 			else:
 				sendMessage(reportingAgent, "doesn't that word look familiar to you?")
-				addToRecord(reportingAgent, "spuriousReports", suspiciousWord)
 				transcript(content="Agent "+reportingAgent+" reported Agent "+potentialEnemy+" for the code: "+suspiciousWord+"but that was their own word too.", tag="interceptedfriendlytransmit")
 				return False
 		else:
 			spuriousReport(suspiciousWord)
-			addToRecord(reportingAgent, "spuriousReports", suspiciousWord)
+			addToRecord(reportingAgent, "spuriousReports", potentialEnemy+" "+suspiciousWord)
 			sendMessage(reportingAgent, "we have no such record, be more careful")
 			awardPoints(reportingAgent, -3)
 			transcript(content="Agent "+reportingAgent+" spuriously reported Agent "+potentialEnemy+" for the code: "+suspiciousWord, tag="spuriousreport")
 			return False
 
 
-# Send a message to an agent based on their agentNumber (not phoneNumber)
+# Send a message to an agent based on their agentNumber
 def sendMessage(agentNumber, content, phoneNumber=None):
 	if agentNumber and not phoneNumber:
 		phoneNumber = getPhoneNumber(agentNumber)
@@ -218,6 +220,8 @@ def sendMessage(agentNumber, content, phoneNumber=None):
 def transcript(content, tag):
 	time = datetime.datetime.now()
 	transcript.insert({"time":time, "tag":tag, "content":content})
+	print content
+	return
 
 # Append to a player's record list (any of "successfulContacts", "interceptedTransmits", "reportedEnemies", or "spuriousReports")
 def addToRecord(agentNumber, field, content):
@@ -248,6 +252,24 @@ def incomingSMS():
 		gameLogic(phoneNumber, content)
 		return "Success!"
 	else return "Eh?"
+
+
+@app.route('/leaderboard', methods=['GET'])
+def leaderboard():
+	spuriousList = lookup(games, "active", "True", "spuriousReports")
+	return render_template("leaderboard.html", players = players, spuriousReports = spuriousList)
+
+
+#----------Jinja filter-------------------------------------------
+@app.template_filter('printtime')
+def timeToString(timestamp):
+    return str(timestamp)[11:16]
+
+
+#-----------Run it!----------------------------------------------
+
+if __name__ == "__main__":
+	app.run(debug=debug)
 
 
 # don't allow more than one report of the same word/enemy or more than one report of same friendly contact
