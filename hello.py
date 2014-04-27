@@ -144,22 +144,29 @@ def parserError(agentNumber, rawcontent):
 # Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend):
 	if !checkFor(players, "agentNumber", potentialFriend):
-		message(reportingAgent, "We don't have records of an agent by that number.")
+		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 	else:
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
 		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="wordlist")
-
+		# check to see if their wordlists are the same
 		if reportingAgentList is potentialFriendList:
-			transcript(content="Agents "+reportingAgent+" and "+potentialFriend+" successfully made contact.", tag="successfulcontact")
-			message(reportingAgent, "Correct!")
-			addToRecord(reportingAgent, "successfulContacts", potentialFriend)
-			awardPoints(reportingAgent, 10)
-			addToRecord(potentialFriend, "successfulContacts", reportingAgent)
-			awardPoints(potentialFriend, 10)
-			return True
+			# but don't let them report the same friend more than once
+			existingcontacts = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="successfulContacts")
+			if not potentialFriend in existingcontacts:
+				transcript(content="Agents "+reportingAgent+" and "+potentialFriend+" successfully made contact.", tag="successfulcontact")
+				sendMessage(reportingAgent, "Correct!")
+				addToRecord(reportingAgent, "successfulContacts", potentialFriend)
+				awardPoints(reportingAgent, 10)
+				sendMessage(potential, "you've been successfully identified by Agent "+reportingAgent)
+				addToRecord(potentialFriend, "successfulContacts", reportingAgent)
+				awardPoints(potentialFriend, 10)
+				return True
+			else:
+				sendMessage(reportingAgent, "Correct, but you already knew that.")
+				return False
 		else:
 			transcript(content="Agent "+reportingAgent+" incorrectly reported friendly contact with Agent "+potentialFriend, tag="incorrectcontact")
-			message(reportingAgent, "Wrong!")
+			sendMessage(reportingAgent, "Wrong! (Watch out)")
 			awardPoints(reportingAgent, -3)
 			return False
 
@@ -243,7 +250,4 @@ def incomingSMS():
 	else return "Eh?"
 
 
-# Cases to handle: unknown number texts in with an existing agent's number
 # don't allow more than one report of the same word/enemy or more than one report of same friendly contact
-# transcript shows: new agents joining, accusations/contacts, spurious reports, agents leaving
-# (css in transcript distinguishes between events, class=eventtype)
