@@ -143,7 +143,7 @@ def parserError(agentNumber, rawcontent):
 
 # Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend):
-	if !checkFor(players, "agentNumber", potentialFriend):
+	if not checkFor(players, "agentNumber", potentialFriend):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 	else:
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
@@ -280,4 +280,3 @@ if __name__ == "__main__":
 
 # TODO
 # re-join the game? No, I will do this by hand if it's necessary
-# check if player is active before sending messages
