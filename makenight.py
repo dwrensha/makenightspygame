@@ -254,7 +254,8 @@ def incomingSMS():
 	if phoneNumber and content:
 		gameLogic(phoneNumber, content)
 		return "Success!"
-	else return "Eh?"
+	else: 
+		return "Eh?"
 
 
 @app.route('/leaderboard', methods=['GET'])
