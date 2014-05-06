@@ -264,7 +264,7 @@ def leaderboard():
 	return render_template("leaderboard.html", players = players, spuriousReports = spuriousList)
 
 @app.route('/leatranscript', methods=['GET'])
-def transcript():
+def showtranscript():
 	return render_template("transcript.html", information = transcript)
 
 #----------Jinja filter-------------------------------------------
