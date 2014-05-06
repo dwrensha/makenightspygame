@@ -66,6 +66,7 @@ def gameLogic(phoneNumber, rawcontent):
 			content = re.split('\W+', rawcontent.lower())
 			# if there's only one word, treat it as a potential report of friendly contact
 			if len(content) == 1:
+				print "just one word"
 				if isAgentNumber(content[0]):
 					reportFriend(agentNumber, content[0])
 				else:
@@ -77,6 +78,8 @@ def gameLogic(phoneNumber, rawcontent):
 					# if any of the words is an agent number, pull it out and store it as the accusee
 					if isAgentNumber(content[i]):
 						accusee = content.pop(i)
+						print "accusee: "+accusee
+						print "everything else: "+content
 				if accusee:
 					if len(content) == 1:
 						reportEnemy(agentNumber, accusee, content[0])
@@ -172,6 +175,7 @@ def reportFriend(reportingAgent, potentialFriend):
 
 # Check if the suspiciousWord is on the potentialEnemy's wordlist but not the reportingAgent's.  If so, congratulate reportingAgent. If not, chide reportingAgent.  Assign points accordingly.
 def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
+	print reportingAgent+" accuses "+potentialEnemy+" of saying "+suspiciousWord
 	if not checkFor(players, "agentNumber", potentialEnemy):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 		return False
