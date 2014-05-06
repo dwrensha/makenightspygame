@@ -27,7 +27,7 @@ databasename = mongoclientURL.split("/")[-1] #gets the last bit of the URL, whic
 mongoclient = MongoClient(mongoclientURL)
 database = mongoclient[databasename]	#loads the assigned database
 players = database["players"]	#loads or makes the collection, whichever should happen
-transcript = database["transcript"]
+transcripts = database["transcript"]
 games = database["games"]
 
 # ----------- Helpers --------------
@@ -222,7 +222,7 @@ def sendMessage(agentNumber, content, phoneNumber=None):
 
 def transcript(content, tag):
 	time = datetime.datetime.now()
-	transcript.insert({"time":time, "tag":tag, "content":content})
+	transcripts.insert({"time":time, "tag":tag, "content":content})
 	print content
 	return
 
@@ -265,7 +265,7 @@ def leaderboard():
 
 @app.route('/leatranscript', methods=['GET'])
 def showtranscript():
-	return render_template("transcript.html", information = transcript)
+	return render_template("transcript.html", information = transcripts)
 
 #----------Jinja filter-------------------------------------------
 @app.template_filter('printtime')
