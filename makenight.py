@@ -79,7 +79,7 @@ def gameLogic(phoneNumber, rawcontent):
 					if isAgentNumber(content[i]):
 						accusee = content.pop(i)
 						print "accusee: "+accusee
-						print "everything else: "+content
+						print "everything else: "+"".join(content)
 				if accusee:
 					if len(content) == 1:
 						reportEnemy(agentNumber, accusee, content[0])
