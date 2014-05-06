@@ -207,6 +207,9 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 def sendMessage(agentNumber, content, phoneNumber=None):
 	if agentNumber and not phoneNumber:
 		phoneNumber = getPhoneNumber(agentNumber)
+		if lookup(collection=players, field="agentNumber", fieldvalue=agentNumber, response="active") is "False":
+			transcript(content="Didn't send message to retired "+agentNumber+": "+content, tag="sentmessage")
+			return
 	if phoneNumber:
 		try:
 			message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=twilionumber)
@@ -273,3 +276,8 @@ def timeToString(timestamp):
 
 if __name__ == "__main__":
 	app.run(debug=debug)
+
+
+# TODO
+# re-join the game? No, I will do this by hand if it's necessary
+# check if player is active before sending messages
