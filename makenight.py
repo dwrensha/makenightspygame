@@ -119,7 +119,7 @@ def newAgent(phoneNumber, rawcontent):
 		players.insert({
 			"agentNumber": agentNumber,
 			"phoneNumber": phoneNumber,
-			"active": "True",
+			"status": "active",
 			"words": wordlist,
 			"successfulContacts":[],
 			"interceptedTransmits":[],
@@ -132,7 +132,7 @@ def newAgent(phoneNumber, rawcontent):
 		return
 
 def retireAgent(agentNumber):
-	players.update({"agentNumber":agentNumber}, {"$set":{"active":"False"}})
+	players.update({"agentNumber":agentNumber}, {"$set":{"status":"retired"}})
 	transcript(content="Agent retired: "+agentNumber, tag="agentretired")
 	sendMessage(agentNumber, "Good work and goodnight, Agent "+agentNumber+"!")
 	return
@@ -207,7 +207,7 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 def sendMessage(agentNumber, content, phoneNumber=None):
 	if agentNumber and not phoneNumber:
 		phoneNumber = getPhoneNumber(agentNumber)
-		if lookup(collection=players, field="agentNumber", fieldvalue=agentNumber, response="active") is "False":
+		if lookup(collection=players, field="agentNumber", fieldvalue=agentNumber, response="status") is "retired":
 			transcript(content="Didn't send message to retired "+agentNumber+": "+content, tag="sentmessage")
 			return
 	if phoneNumber:
@@ -238,7 +238,7 @@ def awardPoints(agentNumber, pointAdjustment):
 
 # Append a spurious word onto the game's record of spurious reports.
 def spuriousReport(suspiciousWord):
-	games.update({"active":"True"}, {"$push":{"spuriousReports":suspiciousWord}})
+	games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
 	return
 
 # ----------- Web --------------
@@ -260,7 +260,7 @@ def incomingSMS():
 
 @app.route('/leaderboard', methods=['GET'])
 def leaderboard():
-	spuriousList = lookup(games, "active", "True", "spuriousReports")
+	spuriousList = lookup(games, "status", "active", "spuriousReports")
 	return render_template("leaderboard.html", players = players, spuriousReports = spuriousList)
 
 @app.route('/leatranscript', methods=['GET'])
