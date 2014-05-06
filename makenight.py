@@ -127,7 +127,7 @@ def newAgent(phoneNumber, rawcontent):
 			"spuriousReports":[],
 			"points": 0
 			})
-		success = sendMessage(agentNumber, "welcome [wordlist here]")
+		success = sendMessage(agentNumber, "welcome here are words: "+" ".join(wordlist))
 		transcript(content="New agent: "+agentNumber, tag="newagent")
 		return
 
