@@ -172,7 +172,7 @@ def reportFriend(reportingAgent, potentialFriend):
 
 # Check if the suspiciousWord is on the potentialEnemy's wordlist but not the reportingAgent's.  If so, congratulate reportingAgent. If not, chide reportingAgent.  Assign points accordingly.
 def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
-	if !checkFor(players, "agentNumber", potentialEnemy):
+	if not checkFor(players, "agentNumber", potentialEnemy):
 		message(reportingAgent, "We don't have records of an agent by that number.")
 		return False
 	else:
