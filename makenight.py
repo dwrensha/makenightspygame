@@ -85,7 +85,7 @@ def gameLogic(phoneNumber, rawcontent):
 					else:
 						sendMessage(agentNumber, "whoa there one word at a time")
 				else:
-					parserError(agentNumber)
+					parserError(agentNumber, rawcontent)
 
 def getAgentNumber(phoneNumber):
 	# first check if it's a known phoneNumber
