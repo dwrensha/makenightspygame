@@ -151,7 +151,7 @@ def reportFriend(reportingAgent, potentialFriend):
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
 		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="words")
 		# check to see if their wordlists are the same
-		if set([reportingAgentList]) == set([potentialFriendList]):
+		if set(reportingAgentList) == set(potentialFriendList):
 			# but don't let them report the same friend more than once
 			existingcontacts = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="successfulContacts")
 			if not potentialFriend in existingcontacts:
