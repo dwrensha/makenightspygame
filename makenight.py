@@ -78,8 +78,6 @@ def gameLogic(phoneNumber, rawcontent):
 					# if any of the words is an agent number, pull it out and store it as the accusee
 					if isAgentNumber(content[i]):
 						accusee = content.pop(i)
-						print "accusee: "+accusee
-						print "everything else: "+"".join(content)
 						break
 				if accusee:
 					if len(content) == 1:
@@ -153,7 +151,7 @@ def reportFriend(reportingAgent, potentialFriend):
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
 		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="words")
 		# check to see if their wordlists are the same
-		if reportingAgentList is potentialFriendList:
+		if set([reportingAgentList]) == set([potentialFriendList]):
 			# but don't let them report the same friend more than once
 			existingcontacts = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="successfulContacts")
 			if not potentialFriend in existingcontacts:
@@ -181,12 +179,9 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 		return False
 	else:
-		print "potentialEnemy "+potentialEnemy+" exists."
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
 		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="words")
-		print "my list is "+"".join(reportingAgentList)+" and theirs is "+"".join(potentialEnemyList)
 		previouslyReportedList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="reportedEnemyCodes")
-		print "I have previously reported "+"".join(previouslyReportedList)
 		if potentialEnemy+" "+suspiciousWord in previouslyReportedList:
 			sendMessage(reportingAgent, "you already sent us that")
 		elif suspiciousWord in potentialEnemyList:
@@ -289,3 +284,4 @@ if __name__ == "__main__":
 
 # TODO
 # re-join the game? No, I will do this by hand if it's necessary
+# don't let people report themselves
