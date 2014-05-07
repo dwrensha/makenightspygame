@@ -181,9 +181,12 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 		return False
 	else:
+		print "potentialEnemy "+potentialEnemy+"exists."
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
 		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="wordlist")
+		print "my list is "+"".join(reportingAgentList)+" and theirs is "+"".join(potentialEnemyList)
 		previouslyReportedList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="reportedEnemyCodes")
+		print "I have previously reported "+"".join(previouslyReportedList)
 		if potentialEnemy+" "+suspiciousWord in previouslyReportedList:
 			sendMessage(reportingAgent, "you already sent us that")
 		elif suspiciousWord in potentialEnemyList:
