@@ -63,7 +63,7 @@ def gameLogic(phoneNumber, rawcontent):
 			retireAgent(agentNumber)
 		else:
 			# chop rawcontent into a list of lowercase words, separating on whitespace and punctuation
-			content = re.split('\W+', rawcontent.lower())
+			content = re.split('\W+', re.sub("/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g","", rawcontent.lower()))
 			# if there's only one word, treat it as a potential report of friendly contact
 			if len(content) == 1:
 				print "just one word"
