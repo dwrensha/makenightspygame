@@ -58,6 +58,7 @@ def gameLogic(phoneNumber, rawcontent):
 		return
 	# recognized number goes on to be treated as a game action
 	else:
+		transcript(content="Agent "+agentNumber+" sent: "+rawcontent, tag="incoming")
 		# "leaving" removes the player from active status
 		if re.match("leaving", rawcontent.lower()):
 			retireAgent(agentNumber)
@@ -285,3 +286,4 @@ if __name__ == "__main__":
 # TODO
 # re-join the game? No, I will do this by hand if it's necessary
 # don't let people report themselves
+# spaces at the beginning of texts
