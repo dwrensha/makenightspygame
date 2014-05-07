@@ -159,7 +159,7 @@ def reportFriend(reportingAgent, potentialFriend):
 				sendMessage(reportingAgent, "Correct!")
 				addToRecord(reportingAgent, "successfulContacts", potentialFriend)
 				awardPoints(reportingAgent, 10)
-				sendMessage(potential, "you've been successfully identified by Agent "+reportingAgent)
+				sendMessage(potentialFriend, "you've been successfully identified by Agent "+reportingAgent)
 				addToRecord(potentialFriend, "successfulContacts", reportingAgent)
 				awardPoints(potentialFriend, 10)
 				return True
