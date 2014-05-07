@@ -150,8 +150,8 @@ def reportFriend(reportingAgent, potentialFriend):
 	if not checkFor(players, "agentNumber", potentialFriend):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 	else:
-		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
-		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="wordlist")
+		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
+		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="words")
 		# check to see if their wordlists are the same
 		if reportingAgentList is potentialFriendList:
 			# but don't let them report the same friend more than once
@@ -181,9 +181,9 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 		return False
 	else:
-		print "potentialEnemy "+potentialEnemy+"exists."
-		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="wordlist")
-		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="wordlist")
+		print "potentialEnemy "+potentialEnemy+" exists."
+		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
+		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="words")
 		print "my list is "+"".join(reportingAgentList)+" and theirs is "+"".join(potentialEnemyList)
 		previouslyReportedList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="reportedEnemyCodes")
 		print "I have previously reported "+"".join(previouslyReportedList)
