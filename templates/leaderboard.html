@@ -21,7 +21,7 @@
 		</tr>
 	{% for player in players.find() %}
 		<tr>
-			<td>{{ player.agentname }}</td>
+			<td>{{ player.agentNumber }}</td>
 			<td>{{ player.successfulContacts|length }}</td>
 			<td>{{ player.interceptedTransmits|length }}</td>
 			<td>{{ player.reportedEnemyCodes|length }}</td>
