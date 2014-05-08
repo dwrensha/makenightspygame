@@ -67,7 +67,6 @@ def gameLogic(phoneNumber, rawcontent):
 			content = re.split('\W+', re.sub("/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g","", rawcontent.lower()))
 			# if there's only one word, treat it as a potential report of friendly contact
 			if len(content) == 1:
-				print "just one word"
 				if isAgentNumber(content[0]):
 					reportFriend(agentNumber, content[0])
 				else:
@@ -84,7 +83,7 @@ def gameLogic(phoneNumber, rawcontent):
 					if len(content) == 1:
 						reportEnemy(agentNumber, accusee, content[0])
 					else:
-						sendMessage(agentNumber, "whoa there one word at a time")
+						sendMessage(agentNumber, "Please only report one suspicious word at a time, agent.")
 				else:
 					parserError(agentNumber, rawcontent)
 
@@ -130,22 +129,24 @@ def newAgent(phoneNumber, rawcontent):
 			"spuriousReports":[],
 			"points": 0
 			})
-		success = sendMessage(agentNumber, "welcome here are words: "+" ".join(wordlist))
+		success = sendMessage(agentNumber, "Greetings, Agent "+agentNumber+"! Your code words are as follows: "+", ".join(wordlist))
 		transcript(content="New agent: "+agentNumber, tag="newagent")
 		return
 
 def retireAgent(agentNumber):
 	players.update({"agentNumber":agentNumber}, {"$set":{"status":"retired"}})
 	transcript(content="Agent retired: "+agentNumber, tag="agentretired")
-	sendMessage(agentNumber, "Good work and goodnight, Agent "+agentNumber+"!")
+	sendMessage(agentNumber, "Good work and goodnight, Agent "+agentNumber+".")
 	return
 
 def parserError(agentNumber, rawcontent):
-	transcript(content="Agent "+agentNumber+" sent unparseable content: "+rawcontent, tag="parsererror")
-	sendMessage(agentNumber, "Pardon? Visit Q if you need help forming reports.")
+	transcript(content="Agent "+agentNumber+"\'s message is unparseable: "+rawcontent, tag="parsererror")
+	sendMessage(agentNumber, "Pardon? Visit Q if you are having trouble forming reports.")
 
 # Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend):
+	if reportingAgent == potentialFriend:
+		sendMessage(reportingAgent, "Please don't waste HQ's time by reporting yourself.")
 	if not checkFor(players, "agentNumber", potentialFriend):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 	else:
@@ -157,25 +158,26 @@ def reportFriend(reportingAgent, potentialFriend):
 			existingcontacts = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="successfulContacts")
 			if not potentialFriend in existingcontacts:
 				transcript(content="Agents "+reportingAgent+" and "+potentialFriend+" successfully made contact.", tag="successfulcontact")
-				sendMessage(reportingAgent, "Correct!")
+				sendMessage(reportingAgent, "Your report of friendly contact with "+potentialFriend+" checks out.  A major commendation to you both.")
 				addToRecord(reportingAgent, "successfulContacts", potentialFriend)
 				awardPoints(reportingAgent, 10)
-				sendMessage(potentialFriend, "you've been successfully identified by Agent "+reportingAgent)
+				sendMessage(potentialFriend, "Congratulations on establising contact with Agent "+reportingAgent)
 				addToRecord(potentialFriend, "successfulContacts", reportingAgent)
 				awardPoints(potentialFriend, 10)
 				return True
 			else:
-				sendMessage(reportingAgent, "Correct, but you already knew that.")
+				sendMessage(reportingAgent, "Contact between yourself and Agent "+potentialFriend+" was already established.")
 				return False
 		else:
 			transcript(content="Agent "+reportingAgent+" incorrectly reported friendly contact with Agent "+potentialFriend, tag="incorrectcontact")
-			sendMessage(reportingAgent, "Wrong! (Watch out)")
-			awardPoints(reportingAgent, -3)
+			sendMessage(reportingAgent, "Our records show that Agent "+potentialFriend+" is not on your side.  Be more careful next time!")
+			awardPoints(reportingAgent, -2)
 			return False
 
 # Check if the suspiciousWord is on the potentialEnemy's wordlist but not the reportingAgent's.  If so, congratulate reportingAgent. If not, chide reportingAgent.  Assign points accordingly.
 def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
-	print reportingAgent+" accuses "+potentialEnemy+" of saying "+suspiciousWord
+	if reportingAgent == potentialEnemy:
+		sendMessage(reportingAgent, "Please don't waste HQ's time by reporting yourself.")
 	if not checkFor(players, "agentNumber", potentialEnemy):
 		sendMessage(reportingAgent, "We don't have records of an agent by that number.")
 		return False
@@ -184,26 +186,26 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="words")
 		previouslyReportedList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="reportedEnemyCodes")
 		if potentialEnemy+" "+suspiciousWord in previouslyReportedList:
-			sendMessage(reportingAgent, "you already sent us that")
+			sendMessage(reportingAgent, "Your report of Agent "+potentialEnemy+"\'s use of code \""+suspiciousWord+"\" was already received.  Do not waste HQ's time with duplicate reports.")
 		elif suspiciousWord in potentialEnemyList:
 			if not suspiciousWord in reportingAgentList:
-				sendMessage(reportingAgent, "congratulations for useful info")
+				sendMessage(reportingAgent, "Good work! Your report of Agent "+potentialEnemy+"\'s use of code \""+suspiciousWord+"\" is valuable intel.")
 				addToRecord(reportingAgent, "reportedEnemyCodes", potentialEnemy+" "+suspiciousWord)
-				awardPoints(reportingAgent, 10)
+				awardPoints(reportingAgent, 3)
 				addToRecord(potentialEnemy, "interceptedTransmits", reportingAgent+" "+suspiciousWord)
-				awardPoints(potentialEnemy, -10)
-				transcript(content="Agent "+reportingAgent+" caught Agent "+potentialEnemy+" transmitting code: "+suspiciousWord, tag="interceptedtransmit")
+				awardPoints(potentialEnemy, -2)
+				transcript(content="Agent "+reportingAgent+" caught Agent "+potentialEnemy+" transmitting code \""+suspiciousWord+"\"", tag="interceptedtransmit")
 				return True
 			else:
-				sendMessage(reportingAgent, "doesn't that word look familiar to you?")
-				transcript(content="Agent "+reportingAgent+" reported Agent "+potentialEnemy+" for the code: "+suspiciousWord+"but that was their own word too.", tag="interceptedfriendlytransmit")
+				sendMessage(reportingAgent, "Doesn't that word look familiar to you?")
+				transcript(content="Agent "+reportingAgent+" reported Agent "+potentialEnemy+" for code \""+suspiciousWord+"\" but that was their own word too.", tag="interceptedfriendlytransmit")
 				return False
 		else:
 			spuriousReport(suspiciousWord)
 			addToRecord(reportingAgent, "spuriousReports", potentialEnemy+" "+suspiciousWord)
-			sendMessage(reportingAgent, "we have no such record, be more careful")
-			awardPoints(reportingAgent, -3)
-			transcript(content="Agent "+reportingAgent+" spuriously reported Agent "+potentialEnemy+" for the code: "+suspiciousWord, tag="spuriousreport")
+			sendMessage(reportingAgent, "\""+suspiciousWord+"\" does not seem to be an enemy code. Be more careful.")
+			awardPoints(reportingAgent, -2)
+			transcript(content="Agent "+reportingAgent+" spuriously reported Agent "+potentialEnemy+" for the code \""+suspiciousWord+"\"", tag="spuriousreport")
 			return False
 
 
@@ -219,7 +221,10 @@ def sendMessage(agentNumber, content, phoneNumber=None):
 			message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=twilionumber)
 	 	except twilio.TwilioRestException as e:
 	 		content = content + " WITH TWILIO ERROR: " + e
-		transcript(content="Sent message to "+agentNumber+": "+content, tag="sentmessage")
+	 	if agentNumber:
+			transcript(content="Sent message to "+agentNumber+": "+content, tag="sentmessage")
+		else: 
+			transcript(content="Sent message to unidentified agent: "+content, tag="sentmessage")
 		return True
 	else:
 		return False
