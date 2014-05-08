@@ -10,3 +10,8 @@ def makeLists(inputString, groupSize, numberOfGroups):
 			groupList.append(inputList.pop(random.randint(0,len(inputList)-1)))
 		outputList.append(groupList)
 	return outputList
+
+
+def cleanAndList(rawcontent):
+	content = re.split('\W+', re.sub("/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g","", rawcontent.lower().strip()))
+	return content
