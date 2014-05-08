@@ -1,37 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta http-equiv="refresh" content="5">
 	<style type="text/css">
-		table {
-			border:0px;
-			padding-left: 5px;
-			padding-right: 5px;
-			padding-top: 0px;
-			text-align: center;
+		body {
+			font-family: Courier;
 		}
+		.scoreboard {
+			box-sizing: border-box;
+			width:75%;
+			float: left;
+		}
+		.entry {
+			box-sizing: border-box;
+			width:25%;
+			text-align: center;
+			/*border: 1px red solid;*/
+			float: left;
+			font-size: 12px;
+		}
+
+		.agentnumber {
+			box-sizing: border-box;
+			margin-right: 3px;
+			/*width: 49%;*/
+		}
+		.score {
+			box-sizing: border-box;
+			margin-left: 3px;
+			/*width: 49%;*/
+		}
+		.spurious {
+			box-sizing: border-box;
+			text-align: center;
+			border: 1px red solid;
+			font-size: 12px;
+			padding-right: 10px;
+			padding-left: 10px;
+			padding-bottom: 20px;
+			padding-top: 0px;
+			margin-top: 0px;
+			border-left: 2px solid black;
+			
+			position: absolute;
+			top:0px;
+			left:75%;
+			width:25%;
+			height:100%;
+			overflow: hidden;
+		}
+		span {
+			box-sizing: border-box;
+			text-align: center;
+			/*border: 1px solid blue;*/
+			width: 50%;
+		}
+		h1{
+			font-size: 20px;
+			text-decoration: underline;
+			margin-top: 0px;
+		}
+		h2{
+			margin-top: 5px;
+			font-size: 13px;
+			text-decoration: underline;
+		}
+
 	</style>
 </head>
 <body>
-	<table border=0 cellpadding=10px>
-		<tr>
-			<td>Agent</td>
-			<td>Successful Contacts</td>
-			<td>Intercepted Transmits</td>
-			<td>Reported Enemy Codes</td>
-			<td>Spurious Reports</td>
-		</tr>
-	{% for player in players.find() %}
-		<tr>
-			<td>{{ player.agentNumber }}</td>
-			<td>{{ player.successfulContacts|length }}</td>
-			<td>{{ player.interceptedTransmits|length }}</td>
-			<td>{{ player.reportedEnemyCodes|length }}</td>
-			<td>{{ player.spuriousReports|length }}</td>
-			<td>{{ player.points }}</td>
-		</tr>
-	{% endfor %}
-	</table>
-	<hr>
-	Spurious reports:<br> {% for item in spuriousReports %}{{ item }} {% endfor %}
+	<div class="scoreboard">
+		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
+		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
+		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
+		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
+
+		{% for player in players.find() %}
+		<div class="entry"><span class="agentnumber">{{ player.agentNumber }}</span><span class="score">{{ player.points }}</span></div>
+		{% endfor %}
+	</div>
+	<div class="spurious">
+		<h1>Spurious Reports</h1>
+		{% for item in spuriousReports|reverse %}<span class="report">{{ item }}</span> {% endfor %}	
+	</div>
 </body>
 </html>
