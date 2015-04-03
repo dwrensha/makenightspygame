@@ -23,6 +23,9 @@ mynumber = os.environ['ME']
 # Init twilio
 twilioclient = TwilioRestClient(account_sid, auth_token)
 
+# Port needed for socketio
+heroku_port = os.environ['PORT']
+
 # MongoHQ account info, also from Heroku environment variables
 mongoclientURL = os.environ['MONGOHQ_URL']
 databasename = mongoclientURL.split("/")[-1] #gets the last bit of the URL, which is the database name
@@ -309,7 +312,7 @@ def timeToString(timestamp):
 
 if __name__ == "__main__":
 	# app.run(debug=debug)
-	socketio.run(app)
+	socketio.run(app, port=heroku_port)
 
 # TODO
 # re-join the game? No, I will do this by hand if it's necessary
