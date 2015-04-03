@@ -72,7 +72,8 @@
 	var players = [
 		{% for player in players.find() %}
 		{
-			"{{ player.agentNumber }}": {{ player.points }}
+			"agentNumber": {{ player.agentNumber }},
+			"points": {{ player.points }}
 		},
 		{% endfor %}
 	];
