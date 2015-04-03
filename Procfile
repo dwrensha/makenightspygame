@@ -1,1 +1,1 @@
-web: gunicorn makenight:app
+web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker makenight:app
