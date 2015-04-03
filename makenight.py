@@ -12,6 +12,8 @@ from flask_socketio import SocketIO, emit
 debug = False
 app = Flask(__name__)
 
+socketio = SocketIO(app)
+
 # ----------- Setup --------------
 # Twilio account info, to be gotten from Heroku environment variables
 account_sid = os.environ['ACCOUNT_SID'] 
@@ -287,8 +289,14 @@ def testThoseSockets():
 
 @app.route('/socketsend', methods=['GET'])
 def sendThatSocket():
-	emit('message', "hello")
+	print "loaded"
+	socketio.emit('message', "hello from a get request")
 	return "success"
+
+
+@socketio.on('message')
+def handle_source():
+    socketio.emit('message', "hello from a socket event")
 
 
 #----------Jinja filter-------------------------------------------

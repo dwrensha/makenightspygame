@@ -7,15 +7,17 @@
     <script type="text/javascript">
     var ws = io.connect()
     // 'http://localhost:5000/'
-    // console.log("Handshook");
+    console.log("Handshook");
 
     ws.on('message', function(data) {
-        console.log(arguments);
+        // console.log(arguments);
         console.log("got message: "+data);
         var li = document.createElement('li');
         li.innerHTML = data;
         document.querySelector('#transcript').appendChild(li);
     });
+
+    ws.emit("message");
     </script>
 </head>
 <body>
