@@ -292,15 +292,15 @@ def leaderboard():
 def showtranscript():
 	return render_template("transcript.html", information = transcripts)
 
-# @app.route('/sockettest', methods=['GET'])
-# def testThoseSockets():
-# 	return render_template("sockettest.html")
+@app.route('/sockettest', methods=['GET'])
+def testThoseSockets():
+	return render_template("sockettest.html")
 
-# @app.route('/socketsend', methods=['GET'])
-# def sendThatSocket():
-# 	print "loaded"
-# 	socketio.emit('message', "hello from a get request")
-# 	return "success"
+@app.route('/socketsend', methods=['GET'])
+def sendThatSocket():
+	print "loaded"
+	socketio.emit('message', "hello from a get request")
+	return "success"
 
 @socketio.on('message')
 def handle_source():
