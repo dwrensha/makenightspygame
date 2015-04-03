@@ -79,6 +79,15 @@
 	];
 
 	function renderBoard () {
+		players.sort(function (a, b) {  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+			if (a.points < b.points) {
+				return 1;
+			}
+			if (a.points > b.points) {
+				return -1;
+			}
+			return 0;
+		})
 		for (var i = 0; i < players.length; i++) {
 			var li = document.createElement('li');
 			// li.className = data.tag;
