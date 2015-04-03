@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <title>Transcript</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script> 
+    <script type="text/javascript">
+    var ws = io.connect()
+    // 'http://localhost:5000/'
+    // console.log("Handshook");
+
+    ws.on('message', function(data) {
+        console.log(arguments);
+        console.log("got message: "+data);
+        var li = document.createElement('li');
+        li.innerHTML = data;
+        document.querySelector('#transcript').appendChild(li);
+    });
+    </script>
+</head>
+<body>
+<ul id='transcript'></ul>
+
+</body>
+</html>

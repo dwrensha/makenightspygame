@@ -7,6 +7,7 @@ import datetime
 import random
 import re
 import string
+from flask_socketio import SocketIO, emit
 
 debug = False
 app = Flask(__name__)
@@ -117,6 +118,9 @@ def newAgent(phoneNumber, rawcontent):
 	if checkFor(players, "agentNumber", agentNumber):
 		sendMessage(agentNumber=None, content="That number seems to be taken. Please see Q to sort things out.", phoneNumber=phoneNumber)
 		return
+	elif not isAgentNumber(agentNumber):
+		sendMessage(agentNumber=None, content="I didn't understand that as an agent number. Please see Q to sort things out.", phoneNumber=phoneNumber)
+		return
 	else:
 		wordlist = assignWords()
 		players.insert({
@@ -167,7 +171,7 @@ def reportFriend(reportingAgent, potentialFriend):
 				awardPoints(potentialFriend, 10)
 				return True
 			else:
-				sendMessage(reportingAgent, "Contact between yourself and Agent "+potentialFriend+" was already established.")
+				sendMessage(reportingAgent, "Contact between yourself and Agent "+potentialFriend+" has already been established.")
 				return False
 		else:
 			transcript(content="Agent "+reportingAgent+" incorrectly reported friendly contact with Agent "+potentialFriend, tag="incorrectcontact")
@@ -198,7 +202,7 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord):
 				transcript(content="Agent "+reportingAgent+" caught Agent "+potentialEnemy+" transmitting code \""+suspiciousWord+"\"", tag="interceptedtransmit")
 				return True
 			else:
-				sendMessage(reportingAgent, "Doesn't that word look familiar to you?")
+				sendMessage(reportingAgent, "Doesn't that word look familiar to you? If you mean to report a friendly agent, send only their agent number.")
 				transcript(content="Agent "+reportingAgent+" reported Agent "+potentialEnemy+" for code \""+suspiciousWord+"\" but that was their own word too.", tag="interceptedfriendlytransmit")
 				return False
 		else:
@@ -277,6 +281,19 @@ def leaderboard():
 def showtranscript():
 	return render_template("transcript.html", information = transcripts)
 
+@app.route('/sockettest', methods=['GET'])
+def testThoseSockets():
+	return render_template("sockettest.html")
+
+@app.route('/socketsend', methods=['GET'])
+def sendThatSocket():
+	content = request.xyzzy
+	socketEmit(content)
+	return "success"
+
+def socketEmit(content):
+	emit('message', content)
+
 #----------Jinja filter-------------------------------------------
 @app.template_filter('printtime')
 def timeToString(timestamp):
@@ -286,10 +303,11 @@ def timeToString(timestamp):
 #-----------Run it!----------------------------------------------
 
 if __name__ == "__main__":
-	app.run(debug=debug)
-
+	# app.run(debug=debug)
+	socketio.run(app)
 
 # TODO
 # re-join the game? No, I will do this by hand if it's necessary
-# don't let people report themselves
+# don't let people report themselves (DONE)
 # spaces at the beginning of texts
+# sweet websocket leaderboard
