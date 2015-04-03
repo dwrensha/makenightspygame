@@ -287,12 +287,9 @@ def testThoseSockets():
 
 @app.route('/socketsend', methods=['GET'])
 def sendThatSocket():
-	content = request.xyzzy
-	socketEmit(content)
+	emit('message', "hello")
 	return "success"
 
-def socketEmit(content):
-	emit('message', content)
 
 #----------Jinja filter-------------------------------------------
 @app.template_filter('printtime')
