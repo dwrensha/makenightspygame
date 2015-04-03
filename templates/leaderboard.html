@@ -7,21 +7,45 @@
 		body {
 			font-family: Courier;
 		}
+		.scoreboard {
+			text-align: center;
+			column-width: 10em;
+			column-gap: 15px;
+			column-rule: 1px solid #000;
+
+			-webkit-column-width: 10em;
+			-webkit-column-gap: 15px;
+			-webkit-column-rule: 1px solid #000;
+
+			-moz-column-width: 10em;
+			-moz-column-gap: 15px;
+			-moz-column-rule: 1px solid #000;
+			max-height: 75%;
+		}
+
+		.agent {
+			display: block;
+		}
 
 	</style>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script> 
 	<script type="text/javascript">
-	var players = [
+	players = {
 		{% for player in players.find() %}
-		{
-			"agentNumber": {{ player.agentNumber }},
-			"points": {{ player.points }}
-		},
+		"{{ player.agentNumber }}": {{ player.points }},
+		
 		{% endfor %}
-	];
+		// -------------------------
+	// "0": 85,"1": 38,"2": 39,"3": 99,"4": 56,"5": 83,"6": 93,"7": 69,"8": 27,"9": 43,"10": 28,"11": 39,"12": 10,"13": 83,"14": 35,"15": 97,"16": 12,"17": 21,"18": 79,"19": 56,"20": 62,"21": 23,"22": 56,"23": 6,"24": 38,"25": 43,"26": 38,"27": 66,"28": 33,"29": 66,"30": 46,"31": 1,"32": 25,"33": 65,"34": 33,"35": 64,"36": 31,"37": 43,"38": 88,"39": 72,"40": 71,"41": 79,"42": 49,"43": 52,"44": 1,"45": 24,"46": 21,"47": 93,"48": 49,"49": 59,"50": 93,"51": 50,"52": 58,"53": 46,"54": 51,"55": 51,"56": 84,"57": 86,"58": 64,"59": 82,"60": 9,"61": 43,"62": 26,"63": 72,"64": 56,"65": 98,"66": 73,"67": 11,"68": 76,"69": 82,"70": 78,"71": 42,"72": 85,"73": 3,"74": 51,"75": 82,"76": 22,"77": 46,"78": 12,"79": 100,"80": 51,"81": 24,"82": 26,"83": 76,"84": 8,"85": 13,"86": 18,"87": 37,"88": 75,"89": 75,"90": 53,"91": 70,"92": 36,"93": 74,"94": 54,"95": 88,"96": 52,"97": 17,"98": 5,"99": 88,"100": 74,"101": 60,"102": 67,"103": 49,"104": 30,"105": 16,"106": 5,"107": 2,"108": 76,"109": 84,"110": 29,"111": 77,"112": 82,"113": 29,"114": 44,"115": 31,"116": 32,"117": 94,"118": 78,"119": 49,"120": 50,"121": 7,"122": 39,"123": 63,"124": 13,"125": 24,"126": 86,"127": 43,"128": 33,"129": 39,"130": 50,"131": 28,"132": 65,"133": 16,"134": 52,"135": 44,"136": 72,"137": 80,"138": 31,"139": 26,"140": 59,"141": 55,"142": 7,"143": 72,"144": 71,"145": 42,"146": 75,"147": 72,"148": 20,"149": 88,"150": 96,"151": 51,"152": 45,"153": 95,"154": 90,"155": 67,"156": 32,"157": 16,"158": 21,"159": 63,"160": 74,"161": 83,"162": 33,"163": 31,"164": 50,"165": 19,"166": 27,"167": 87,"168": 98,"169": 89,"170": 62,"171": 15,"172": 23,"173": 90,"174": 26,"175": 10,"176": 77,"177": 4,"178": 26,"179": 54,"180": 78,"181": 39,"182": 50,"183": 57,"184": 50,"185": 16,"186": 41,"187": 60,"188": 4,"189": 46,"190": 55,"191": 22,"192": 75,"193": 53,"194": 35,"195": 66,"196": 69,"197": 43,"198": 87,"199": 58,"200": 71
+	};
+
 
 	function renderBoard () {
-		players.sort(function (a, b) {  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+		sortablePlayers = [];
+		for (key in players) {
+			sortablePlayers.push({"agentNumber": key, "points": players[key]});
+		}
+		sortablePlayers.sort(function (a, b) {  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
 			if (a.points < b.points) {
 				return 1;
 			}
@@ -30,13 +54,16 @@
 			}
 			return 0;
 		})
-		for (var i = 0; i < players.length; i++) {
-			var li = document.createElement('li');
-			// li.className = data.tag;
-			li.innerHTML = players[i].agentNumber + ": " + players[i].points;
-			document.querySelector('.scoreboard').appendChild(li);
-			// needs to overwrite the existing render
+		var newScoreboard = document.createElement('div');
+		newScoreboard.className = "scoreboard";
+		for (var i = 0; i < sortablePlayers.length; i++) {
+			var span = document.createElement('span');
+			span.className = "agent";
+			span.innerHTML = sortablePlayers[i].agentNumber + ": " + sortablePlayers[i].points;
+			newScoreboard.appendChild(span);
 		};
+		var oldScoreboard = document.querySelector('.scoreboard');
+		oldScoreboard.parentElement.replaceChild(newScoreboard, oldScoreboard);
 	}
 
 	window.onload = renderBoard;
@@ -44,19 +71,18 @@
 	var ws = io.connect();
 
 	ws.on('scorechange', function(data) {
-
-		// needs to change the object with the given agentNumber in the players array to have the specified number of points,
-		// then re-render the board
-	});
-
-	ws.on('newplayer', function(data) {
-
-		//needs to add a new player object to players array,
-		// the re-render the board
+		var agentNumber = data.agentNumber;
+		if (players[agentNumber]) {
+			var newPoints = players[agentNumber] + data.points;
+			players[agentNumber] = newPoints;
+		}
+		else {
+			players[agentNumber] = 0;
+		}
+		renderBoard();
 	});
 
 	ws.on('spurious', function(data) {
-	    // console.log(arguments);
 	    console.log("new spurious report: "+data);
 	    var span = document.createElement('span');
 	    span.className = "report";
@@ -64,13 +90,13 @@
 	    document.querySelector('.spurious').appendChild(span);
 	});
 
-	// ws.emit("message");
 	</script>
 </head>
 <body>
-	<ul class="scoreboard">
+	<div class="headline"><h1>Secret Agent High Scores!</h2></div>
+	<div class="scoreboard">
 
-	</ul>
+	</div>
 	<div class="spurious">
 		<h1>Spurious Reports</h1>
 		{% for item in spuriousReports|reverse %}<span class="report">{{ item }}</span> {% endfor %}	

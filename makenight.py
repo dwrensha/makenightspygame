@@ -141,6 +141,7 @@ def newAgent(phoneNumber, rawcontent):
 			})
 		success = sendMessage(agentNumber, "Greetings, Agent "+agentNumber+"! Your code words are as follows: "+", ".join(wordlist))
 		transcript(content="New agent: "+agentNumber, tag="newagent")
+		socketio.emit("scorechange", {"agentNumber": agentNumber, "points": 0})
 		return
 
 def retireAgent(agentNumber):
@@ -254,11 +255,14 @@ def addToRecord(agentNumber, field, content):
 # Increments player's points by pointAdjustment
 def awardPoints(agentNumber, pointAdjustment):
 	players.update({"agentNumber":agentNumber}, {"$inc":{"points":pointAdjustment}})
+	socketio.emit("scorechange", {"agentNumber": agentNumber, "points": pointAdjustment})
 	return
 
 # Append a spurious word onto the game's record of spurious reports.
 def spuriousReport(suspiciousWord):
 	games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
+	socketio.emit("spurious", suspiciousWord)
+
 	return
 
 # ----------- Web --------------
@@ -288,19 +292,19 @@ def leaderboard():
 def showtranscript():
 	return render_template("transcript.html", information = transcripts)
 
-@app.route('/sockettest', methods=['GET'])
-def testThoseSockets():
-	return render_template("sockettest.html")
+# @app.route('/sockettest', methods=['GET'])
+# def testThoseSockets():
+# 	return render_template("sockettest.html")
 
-@app.route('/socketsend', methods=['GET'])
-def sendThatSocket():
-	print "loaded"
-	socketio.emit('message', "hello from a get request")
-	return "success"
+# @app.route('/socketsend', methods=['GET'])
+# def sendThatSocket():
+# 	print "loaded"
+# 	socketio.emit('message', "hello from a get request")
+# 	return "success"
 
-@socketio.on('message')
-def handle_source():
-    socketio.emit('message', "hello from a socket event")
+# @socketio.on('message')
+# def handle_source():
+#     socketio.emit('message', "hello from a socket event")
 
 
 #----------Jinja filter-------------------------------------------
