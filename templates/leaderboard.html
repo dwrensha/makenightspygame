@@ -71,6 +71,7 @@
 	var ws = io.connect();
 
 	ws.on('message', function(data) {
+		console.log(data);
 		if(data.type == "scorechange") {
 			var agentNumber = data.agentNumber;
 			if (players[agentNumber]) {
