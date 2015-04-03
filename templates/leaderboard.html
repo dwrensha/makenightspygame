@@ -70,16 +70,26 @@
 
 	var ws = io.connect();
 
-	ws.on('scorechange', function(data) {
-		var agentNumber = data.agentNumber;
-		if (players[agentNumber]) {
-			var newPoints = players[agentNumber] + data.points;
-			players[agentNumber] = newPoints;
+	ws.on('message', function(data) {
+		if(data.type == "scorechange") {
+			var agentNumber = data.agentNumber;
+			if (players[agentNumber]) {
+				var newPoints = players[agentNumber] + data.points;
+				players[agentNumber] = newPoints;
+			}
+			else {
+				players[agentNumber] = 0;
+			}
+			renderBoard();
 		}
-		else {
-			players[agentNumber] = 0;
+		else if (data.type == "spurious") {
+			console.log("new spurious report: "+data.word);
+			var span = document.createElement('span');
+			span.className = "report";
+			span.innerHTML = data.word;
+			document.querySelector('.spurious').appendChild(span);
 		}
-		renderBoard();
+
 	});
 
 	ws.on('spurious', function(data) {
