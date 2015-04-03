@@ -86,7 +86,7 @@
 		};
 	}
 
-	renderBoard();
+	renderBoard(players);
 
 	var ws = io.connect()
 	ws.on('scorechange', function(data) {
