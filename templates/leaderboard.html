@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="refresh" content="5">
+	<!-- <meta http-equiv="refresh" content="5"> -->
 	<style type="text/css">
 		body {
 			font-family: Courier;
@@ -67,18 +67,52 @@
 		}
 
 	</style>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script> 
+	<script type="text/javascript">
+	var players = [
+		{% for player in players.find() %}
+		{
+			{{ player.agentNumber }}: {{ player.points }},
+		}
+		{% endfor %}
+	];
+
+	function renderBoard (players) {
+		for (var i = 0; i < players.length; i++) {
+			var li = document.createElement('li');
+			// li.className = data.tag;
+			li.innerHTML = players[i].agentNumber + ": " + players[i].points;
+			document.querySelector('.scoreboard').appendChild(li);
+		};
+	}
+
+	renderBoard();
+
+	var ws = io.connect()
+	ws.on('scorechange', function(data) {
+	    // console.log(arguments);
+	    console.log("got message: "+data);
+	    var li = document.createElement('li');
+	    li.className = data.tag;
+	    li.innerHTML = data.time.slice(17, 22) + ": " + data.content;
+	    document.querySelector('#transcript').appendChild(li);
+	});
+	ws.on('spurious', function(data) {
+	    // console.log(arguments);
+	    console.log("new spurious report: "+data);
+	    var span = document.createElement('span');
+	    span.className = "report";
+	    span.innerHTML = data;
+	    document.querySelector('.spurious').appendChild(span);
+	});
+
+	// ws.emit("message");
+	</script>
 </head>
 <body>
-	<div class="scoreboard">
-		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
-		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
-		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
-		<div class="entry"><h2><span class="agentnumber">Agent</span><span class="score">Score</span></h2></div>
+	<ul class="scoreboard">
 
-		{% for player in players.find() %}
-		<div class="entry"><span class="agentnumber">{{ player.agentNumber }}</span><span class="score">{{ player.points }}</span></div>
-		{% endfor %}
-	</div>
+	</ul>
 	<div class="spurious">
 		<h1>Spurious Reports</h1>
 		{% for item in spuriousReports|reverse %}<span class="report">{{ item }}</span> {% endfor %}	
