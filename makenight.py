@@ -302,9 +302,9 @@ def showtranscript():
 # 	socketio.emit('message', "hello from a get request")
 # 	return "success"
 
-# @socketio.on('message')
-# def handle_source():
-#     socketio.emit('message', "hello from a socket event")
+@socketio.on('message')
+def handle_source():
+    socketio.emit('message', "hello from a socket event")
 
 
 #----------Jinja filter-------------------------------------------
