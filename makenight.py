@@ -270,6 +270,7 @@ def greet():
 def incomingSMS():
 	phoneNumber = request.form.get('From', None)
 	content = request.form.get('Body', None)
+	socketio.emit('message', content)
 	if phoneNumber and content:
 		gameLogic(phoneNumber, content)
 		return "Success!"
@@ -295,7 +296,6 @@ def sendThatSocket():
 	print "loaded"
 	socketio.emit('message', "hello from a get request")
 	return "success"
-
 
 @socketio.on('message')
 def handle_source():
