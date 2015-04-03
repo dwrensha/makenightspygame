@@ -171,7 +171,7 @@ def reportFriend(reportingAgent, potentialFriend):
 				sendMessage(reportingAgent, "Your report of friendly contact with "+potentialFriend+" checks out.  A major commendation to you both.")
 				addToRecord(reportingAgent, "successfulContacts", potentialFriend)
 				awardPoints(reportingAgent, 10)
-				sendMessage(potentialFriend, "Congratulations on establising contact with Agent "+reportingAgent)
+				sendMessage(potentialFriend, "Congratulations on establising contact with Agent "+reportingAgent+".")
 				addToRecord(potentialFriend, "successfulContacts", reportingAgent)
 				awardPoints(potentialFriend, 10)
 				return True
@@ -242,6 +242,7 @@ def sendMessage(agentNumber, content, phoneNumber=None):
 def transcript(content, tag):
 	time = datetime.datetime.now()
 	transcripts.insert({"time":time, "tag":tag, "content":content})
+	socketio.emit('transcript', {"time":time, "tag":tag, "content":content})
 	print content
 	return
 
