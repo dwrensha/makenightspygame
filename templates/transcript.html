@@ -42,8 +42,8 @@
         // console.log(arguments);
         console.log("got message: "+data);
         var li = document.createElement('li');
-        li.class = data.tag;
-        li.innerHTML = data.time + ": " + data.content;
+        li.className = data.tag;
+        li.innerHTML = data.time.slice(17, 22) + ": " + data.content;
         document.querySelector('#transcript').appendChild(li);
     });
 
