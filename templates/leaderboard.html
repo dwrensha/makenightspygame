@@ -3,67 +3,9 @@
 <head>
 	<!-- <meta http-equiv="refresh" content="5"> -->
 	<style type="text/css">
+		
 		body {
 			font-family: Courier;
-		}
-		.scoreboard {
-			box-sizing: border-box;
-			width:75%;
-			float: left;
-		}
-		.entry {
-			box-sizing: border-box;
-			width:25%;
-			text-align: center;
-			/*border: 1px red solid;*/
-			float: left;
-			font-size: 20px;
-		}
-
-		.agentnumber {
-			box-sizing: border-box;
-			margin-right: 3px;
-			/*width: 49%;*/
-		}
-		.score {
-			box-sizing: border-box;
-			margin-left: 3px;
-			/*width: 49%;*/
-		}
-		.spurious {
-			box-sizing: border-box;
-			text-align: center;
-			border: 1px red solid;
-			font-size: 12px;
-			padding-right: 10px;
-			padding-left: 10px;
-			padding-bottom: 20px;
-			padding-top: 20px;
-			margin-top: 0px;
-			border-left: 2px solid black;
-			
-			position: absolute;
-			top:0px;
-			left:75%;
-			width:25%;
-			height:100%;
-			overflow: hidden;
-		}
-		span {
-			box-sizing: border-box;
-			text-align: center;
-			/*border: 1px solid blue;*/
-			width: 50%;
-		}
-		h1{
-			font-size: 20px;
-			text-decoration: underline;
-			margin-top: 0px;
-		}
-		h2{
-			margin-top: 5px;
-			font-size: 18px;
-			text-decoration: underline;
 		}
 
 	</style>
@@ -93,20 +35,26 @@
 			// li.className = data.tag;
 			li.innerHTML = players[i].agentNumber + ": " + players[i].points;
 			document.querySelector('.scoreboard').appendChild(li);
+			// needs to overwrite the existing render
 		};
 	}
 
 	window.onload = renderBoard;
 
-	var ws = io.connect()
+	var ws = io.connect();
+
 	ws.on('scorechange', function(data) {
-	    // console.log(arguments);
-	    console.log("got message: "+data);
-	    var li = document.createElement('li');
-	    li.className = data.tag;
-	    li.innerHTML = data.time.slice(17, 22) + ": " + data.content;
-	    document.querySelector('#transcript').appendChild(li);
+
+		// needs to change the object with the given agentNumber in the players array to have the specified number of points,
+		// then re-render the board
 	});
+
+	ws.on('newplayer', function(data) {
+
+		//needs to add a new player object to players array,
+		// the re-render the board
+	});
+
 	ws.on('spurious', function(data) {
 	    // console.log(arguments);
 	    console.log("new spurious report: "+data);
