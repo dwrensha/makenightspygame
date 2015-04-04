@@ -36,19 +36,7 @@
         color:#93a1a1;
     }
     </style>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script> 
-    <script type="text/javascript">
-    var ws = io.connect()
-    ws.on('transcript', function(data) {
-        // console.log(arguments);
-        console.log("got message: "+data);
-        var li = document.createElement('li');
-        li.className = data.tag;
-        li.innerHTML = data.time.slice(17, 22) + ": " + data.content;
-        document.querySelector('#transcript').appendChild(li);
-    });
-
-    // ws.emit("message");
+    
     </script>
 </head>
 <body>
