@@ -153,17 +153,17 @@ def newAgent(phoneNumber, rawcontent, language):
 def retireAgent(agentNumber, language=english):
 	players.update({"agentNumber":agentNumber}, {"$set":{"status":"retired"}})
 	transcript(content="Agent retired: "+agentNumber, tag="agentretired")
-	sendMessage(agentNumber, ["Good work and goodnight, Agent "+agentNumber+".", "Beau travail, et bonne nuit, Agent "+agentNumber+"."]], language = language)
+	sendMessage(agentNumber, ["Good work and goodnight, Agent "+agentNumber+".", "Beau travail, et bonne nuit, Agent "+agentNumber+"."], language = language)
 	return
 
 def parserError(agentNumber, rawcontent, language=english):
 	transcript(content="Agent "+agentNumber+"\'s message is unparseable: "+rawcontent, tag="parsererror")
-	sendMessage(agentNumber, ["Pardon? Visit Q if you are having trouble forming reports.", "Pardon ? Allez voir Q si vous avez du mal à écrire des rapports."]], language = language)
+	sendMessage(agentNumber, ["Pardon? Visit Q if you are having trouble forming reports.", "Pardon ? Allez voir Q si vous avez du mal à écrire des rapports."], language = language)
 
 # Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend, language=english):
 	if reportingAgent == potentialFriend:
-		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-même."]], language = language)
+		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-même."], language = language)
 	if not checkFor(players, "agentNumber", potentialFriend):
 		sendMessage(reportingAgent, ["We don't have records of an agent by that number.", "Nous n'avons pas ce numéro d'agent dans nos dossiers."], language = language)
 	else:
@@ -175,7 +175,7 @@ def reportFriend(reportingAgent, potentialFriend, language=english):
 			existingcontacts = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="successfulContacts")
 			if not potentialFriend in existingcontacts:
 				transcript(content="Agents "+reportingAgent+" and "+potentialFriend+" successfully made contact.", tag="successfulcontact")
-				sendMessage(reportingAgent, ["Your report of friendly contact with "+potentialFriend+" checks out.  A major commendation to you both.", "Votre rapport de contact avec l'agent ami "+potentialFriend+" semble correct. Une citation majeure à vous deux."]], language = language)
+				sendMessage(reportingAgent, ["Your report of friendly contact with "+potentialFriend+" checks out.  A major commendation to you both.", "Votre rapport de contact avec l'agent ami "+potentialFriend+" semble correct. Une citation majeure à vous deux."], language = language)
 				addToRecord(reportingAgent, "successfulContacts", potentialFriend)
 				awardPoints(reportingAgent, 10)
 				sendMessage(potentialFriend, ["Congratulations on establishing contact with Agent "+reportingAgent+".", "Félicitations pour avoir établi le contact avec l'Agent "+reportingAgent+"."], language = language)
