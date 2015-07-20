@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from flask import *
 import twilio.twiml
 from twilio.rest import TwilioRestClient
