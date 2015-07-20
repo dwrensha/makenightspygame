@@ -305,6 +305,7 @@ def incomingSMSEnglish():
 	print "content:"
 	print content
 	if phoneNumber and content:
+		print "going to gameLogic"
 		gameLogic(phoneNumber = phoneNumber, rawContent = content, language = english)
 		return "Success!"
 	else: 
