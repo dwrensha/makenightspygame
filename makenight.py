@@ -289,7 +289,7 @@ def incomingSMS():
 	content = request.form.get('Body', None)
 	# socketio.emit('message', content)
 	if phoneNumber and content:
-		gameLogic(phoneNumber = phoneNumber, rawContent = content, language = english)
+		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = english)
 		return "Success!"
 	else: 
 		return "Eh?"
@@ -306,7 +306,7 @@ def incomingSMSEnglish():
 	print content
 	if phoneNumber and content:
 		print "going to gameLogic"
-		gameLogic(phoneNumber = phoneNumber, rawContent = content, language = english)
+		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = english)
 		return "Success!"
 	else: 
 		return "Eh?"
@@ -317,7 +317,7 @@ def incomingSMSFrench():
 	content = request.form.get('Body', None)
 	# socketio.emit('message', content)
 	if phoneNumber and content:
-		gameLogic(phoneNumber = phoneNumber, rawContent = content, language = french)
+		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = french)
 		return "Success!"
 	else: 
 		return "Eh?"
