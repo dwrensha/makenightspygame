@@ -300,7 +300,9 @@ def incomingSMSEnglish():
 	phoneNumber = request.form.get('From', None)
 	content = request.form.get('Body', None)
 	# socketio.emit('message', content)
+	print "got a request; phoneNumber:"
 	print phoneNumber
+	print "content:"
 	print content
 	if phoneNumber and content:
 		gameLogic(phoneNumber = phoneNumber, rawContent = content, language = english)
@@ -353,6 +355,7 @@ def timeToString(timestamp):
 #-----------Run it!----------------------------------------------
 
 if __name__ == "__main__":
+	print "running the app"
 	app.run(debug=debug)
 	# socketio.run(app, port=heroku_port)
 
