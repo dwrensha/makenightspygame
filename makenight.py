@@ -63,7 +63,7 @@ def isAgentNumber(word):
 # A message containing a number and a word from a known phoneNumber should check if the number and word in the content correspond to an enemy agent.
 # Anything else should respond with a help message
 
-def gameLogic(phoneNumber, rawcontent, language = english):
+def gameLogic(phoneNumber, rawcontent, language = 0):
 	print "gameLogic"
 	agentNumber = getAgentNumber(phoneNumber)
 	# unrecognized number should create a new agent, getting agentName from content
