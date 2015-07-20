@@ -64,7 +64,6 @@ def isAgentNumber(word):
 # Anything else should respond with a help message
 
 def gameLogic(phoneNumber, rawcontent, language = 0):
-	print "gameLogic"
 	agentNumber = getAgentNumber(phoneNumber)
 	# unrecognized number should create a new agent, getting agentName from content
 	if not agentNumber:
@@ -125,7 +124,6 @@ def assignWords():
 # Assign the new agent their wordlist, enter them into the database, and message them their list.
 # (Don't try to use sendMessage with an agentNumber before they're in the DB!)
 def newAgent(phoneNumber, rawcontent, language):
-	print "newAgent"
 	content = re.split('\W+', rawcontent.lower())
 	agentNumber = content[0]
 	if checkFor(players, "agentNumber", agentNumber):
@@ -232,7 +230,7 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord, language=english
 # Send a message to an agent based on their agentNumber
 def sendMessage(agentNumber, contentList, phoneNumber=None, language=english):
 	content = contentList[language]
-	print content;
+	# print content;
 	fromNumber = twilioNumbers[language]
 	if agentNumber and not phoneNumber:
 		phoneNumber = getPhoneNumber(agentNumber)
@@ -300,12 +298,7 @@ def incomingSMSEnglish():
 	phoneNumber = request.form.get('From', None)
 	content = request.form.get('Body', None)
 	# socketio.emit('message', content)
-	print "got a request; phoneNumber:"
-	print phoneNumber
-	print "content:"
-	print content
 	if phoneNumber and content:
-		print "going to gameLogic"
 		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = english)
 		return "Success!"
 	else: 
