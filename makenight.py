@@ -228,8 +228,9 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord, language=english
 
 
 # Send a message to an agent based on their agentNumber
-def sendMessage(agentNumber, contentArray, phoneNumber=None, language=english):
-	content = contentArray[language]
+def sendMessage(agentNumber, contentList, phoneNumber=None, language=english):
+	content = contentList[language]
+	print content;
 	fromNumber = twilioNumbers[language]
 	if agentNumber and not phoneNumber:
 		phoneNumber = getPhoneNumber(agentNumber)
