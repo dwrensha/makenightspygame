@@ -9,12 +9,12 @@ import datetime
 import random
 import re
 import string
-from flask_socketio import SocketIO, emit
+# from flask_socketio import SocketIO, emit
 
 debug = False
 app = Flask(__name__)
 
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 
 english = 0
 french = 1
@@ -252,7 +252,7 @@ def sendMessage(agentNumber, contentArray, phoneNumber=None, language=english):
 def transcript(content, tag):
 	time = datetime.datetime.now()
 	transcripts.insert({"time":time, "tag":tag, "content":content})
-	socketio.emit('transcript', {"time":time, "tag":tag, "content":content})
+	# socketio.emit('transcript', {"time":time, "tag":tag, "content":content})
 	print content
 	return
 
@@ -264,13 +264,13 @@ def addToRecord(agentNumber, field, content):
 # Increments player's points by pointAdjustment
 def awardPoints(agentNumber, pointAdjustment):
 	players.update({"agentNumber":agentNumber}, {"$inc":{"points":pointAdjustment}})
-	socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": pointAdjustment})
+	# socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": pointAdjustment})
 	return
 
 # Append a spurious word onto the game's record of spurious reports.
 def spuriousReport(suspiciousWord):
 	games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
-	socketio.emit("message", {"type": "scorechange", "word": suspiciousWord})
+	# socketio.emit("message", {"type": "scorechange", "word": suspiciousWord})
 
 	return
 
@@ -324,19 +324,19 @@ def leaderboard():
 def showtranscript():
 	return render_template("transcript.html", information = transcripts)
 
-@app.route('/sockettest', methods=['GET'])
-def testThoseSockets():
-	return render_template("sockettest.html")
+# @app.route('/sockettest', methods=['GET'])
+# def testThoseSockets():
+# 	return render_template("sockettest.html")
 
-@app.route('/socketsend', methods=['GET'])
-def sendThatSocket():
-	print "loaded"
-	socketio.emit('message', "hello from a get request")
-	return "success"
+# @app.route('/socketsend', methods=['GET'])
+# def sendThatSocket():
+# 	print "loaded"
+# 	socketio.emit('message', "hello from a get request")
+# 	return "success"
 
-@socketio.on('message')
-def handle_source():
-    socketio.emit('message', "hello from a socket event")
+# @socketio.on('message')
+# def handle_source():
+#     socketio.emit('message', "hello from a socket event")
 
 
 #----------Jinja filter-------------------------------------------
@@ -348,8 +348,8 @@ def timeToString(timestamp):
 #-----------Run it!----------------------------------------------
 
 if __name__ == "__main__":
-	# app.run(debug=debug)
-	socketio.run(app, port=heroku_port)
+	app.run(debug=debug)
+	# socketio.run(app, port=heroku_port)
 
 # TODO
 # re-join the game? No, I will do this by hand if it's necessary
