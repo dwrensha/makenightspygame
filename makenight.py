@@ -300,6 +300,8 @@ def incomingSMSEnglish():
 	phoneNumber = request.form.get('From', None)
 	content = request.form.get('Body', None)
 	# socketio.emit('message', content)
+	print phoneNumber
+	print content
 	if phoneNumber and content:
 		gameLogic(phoneNumber = phoneNumber, rawContent = content, language = english)
 		return "Success!"
