@@ -321,6 +321,11 @@ def leaderboard():
 	spuriousList = lookup(games, "status", "active", "spuriousReports")
 	return render_template("leaderboard.html", players = players, spuriousReports = spuriousList)
 
+@app.route('/fake_leaderboard', methods=['GET'])
+def fake_leaderboard():
+	# spuriousList = lookup(games, "status", "active", "spuriousReports")
+	return render_template("fake_leaderboard.html")
+
 @app.route('/leatranscript', methods=['GET'])
 def showtranscript():
 	return render_template("transcript.html", information = transcripts)
