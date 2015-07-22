@@ -183,7 +183,7 @@ def reportFriend(reportingAgent, potentialFriend, language=english):
 				awardPoints(potentialFriend, 10)
 				return True
 			else:
-				sendMessage(reportingAgent, ["Contact between yourself and Agent "+potentialFriend+" has already been established.", "Le contact entre vous et l'Agent [potentialFriend] a deja ete etabli."], language = language)
+				sendMessage(reportingAgent, ["Contact between yourself and Agent "+potentialFriend+" has already been established.", "Le contact entre vous et l'Agent "+potentialFriend+" a deja ete etabli."], language = language)
 				return False
 		else:
 			transcript(content="Agent "+reportingAgent+" incorrectly reported friendly contact with Agent "+potentialFriend, tag="incorrectcontact")
