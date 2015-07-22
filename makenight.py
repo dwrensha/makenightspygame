@@ -96,7 +96,7 @@ def gameLogic(phoneNumber, rawcontent, language = 0):
 					if len(content) == 1:
 						reportEnemy(agentNumber, accusee, content[0], language)
 					else:
-						sendMessage(agentNumber, ["Please only report one suspicious word at a time, agent.", "Merci de ne rapporter qu'un seul mot suspect à la fois, Agent."], language)
+						sendMessage(agentNumber, ["Please only report one suspicious word at a time, agent.", "Merci de ne rapporter qu'un seul mot suspect a la fois, Agent."], language)
 				else:
 					parserError(agentNumber, rawcontent, language)
 
@@ -127,10 +127,10 @@ def newAgent(phoneNumber, rawcontent, language):
 	content = re.split('\W+', rawcontent.lower())
 	agentNumber = content[0]
 	if checkFor(players, "agentNumber", agentNumber):
-		sendMessage(agentNumber=None, content=["That number seems to be taken. Please see Q to sort things out.", "Ce numéro semble être pris. Voyez avec Q pour régler le problème."], language = language, phoneNumber=phoneNumber)
+		sendMessage(agentNumber=None, content=["That number seems to be taken. Please see Q to sort things out.", "Ce numéro semble être pris. Voyez avec Q pour regler le problème."], language = language, phoneNumber=phoneNumber)
 		return
 	elif not isAgentNumber(agentNumber):
-		sendMessage(agentNumber=None, content=["I didn't understand that as an agent number. Please see Q to sort things out.", "Ceci ne ressemblait pas à un numéro d'agent. Voyez avec Q pour régler le problème."], language = language, phoneNumber=phoneNumber)
+		sendMessage(agentNumber=None, content=["I didn't understand that as an agent number. Please see Q to sort things out.", "Ceci ne ressemblait pas a un numero d'agent. Voyez avec Q pour régler le probleme."], language = language, phoneNumber=phoneNumber)
 		return
 	else:
 		wordlist = assignWords()
@@ -158,14 +158,14 @@ def retireAgent(agentNumber, language=english):
 
 def parserError(agentNumber, rawcontent, language=english):
 	transcript(content="Agent "+agentNumber+"\'s message is unparseable: "+rawcontent, tag="parsererror")
-	sendMessage(agentNumber, ["Pardon? Visit Q if you are having trouble forming reports.", "Pardon ? Allez voir Q si vous avez du mal à écrire des rapports."], language = language)
+	sendMessage(agentNumber, ["Pardon? Visit Q if you are having trouble forming reports.", "Pardon? Allez voir Q si vous avez du mal a ecrire des rapports."], language = language)
 
 # Check if the potentialFriend is on the same team as the reportingAgent.  If so, congratulate both, assign points, and list them on each other's successfulContacts.  If not, warn the reportingAgent and demerit them.
 def reportFriend(reportingAgent, potentialFriend, language=english):
 	if reportingAgent == potentialFriend:
-		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-même."], language = language)
+		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-meme."], language = language)
 	if not checkFor(players, "agentNumber", potentialFriend):
-		sendMessage(reportingAgent, ["We don't have records of an agent by that number.", "Nous n'avons pas ce numéro d'agent dans nos dossiers."], language = language)
+		sendMessage(reportingAgent, ["We don't have records of an agent by that number.", "Nous n'avons pas ce numero d'agent dans nos dossiers."], language = language)
 	else:
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
 		potentialFriendList = lookup(collection=players, field="agentNumber", fieldvalue=potentialFriend, response="words")
@@ -175,39 +175,39 @@ def reportFriend(reportingAgent, potentialFriend, language=english):
 			existingcontacts = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="successfulContacts")
 			if not potentialFriend in existingcontacts:
 				transcript(content="Agents "+reportingAgent+" and "+potentialFriend+" successfully made contact.", tag="successfulcontact")
-				sendMessage(reportingAgent, ["Your report of friendly contact with "+potentialFriend+" checks out.  A major commendation to you both.", "Votre rapport de contact avec l'agent ami "+potentialFriend+" semble correct. Une citation majeure à vous deux."], language = language)
+				sendMessage(reportingAgent, ["Your report of friendly contact with "+potentialFriend+" checks out.  A major commendation to you both.", "Votre rapport de contact avec l'agent ami "+potentialFriend+" semble correct. Une citation majeure a vous deux."], language = language)
 				addToRecord(reportingAgent, "successfulContacts", potentialFriend)
 				awardPoints(reportingAgent, 10)
-				sendMessage(potentialFriend, ["Congratulations on establishing contact with Agent "+reportingAgent+".", "Félicitations pour avoir établi le contact avec l'Agent "+reportingAgent+"."], language = language)
+				sendMessage(potentialFriend, ["Congratulations on establishing contact with Agent "+reportingAgent+".", "Felicitations pour avoir etabli le contact avec l'Agent "+reportingAgent+"."], language = language)
 				addToRecord(potentialFriend, "successfulContacts", reportingAgent)
 				awardPoints(potentialFriend, 10)
 				return True
 			else:
-				sendMessage(reportingAgent, ["Contact between yourself and Agent "+potentialFriend+" has already been established.", "Le contact entre vous et l'Agent [potentialFriend] a déjà été établi."], language = language)
+				sendMessage(reportingAgent, ["Contact between yourself and Agent "+potentialFriend+" has already been established.", "Le contact entre vous et l'Agent [potentialFriend] a deja ete etabli."], language = language)
 				return False
 		else:
 			transcript(content="Agent "+reportingAgent+" incorrectly reported friendly contact with Agent "+potentialFriend, tag="incorrectcontact")
-			sendMessage(reportingAgent, ["Our records show that Agent "+potentialFriend+" is not on your side. Be more careful next time!", "Nos renseignements montrent que l'Agent "+potentialFriend+" n'est pas de votre côté. Soyez plus prudent la prochaine fois!"], language = language)
+			sendMessage(reportingAgent, ["Our records show that Agent "+potentialFriend+" is not on your side. Be more careful next time!", "Nos renseignements montrent que l'Agent "+potentialFriend+" n'est pas de votre cote. Soyez plus prudent la prochaine fois!"], language = language)
 			awardPoints(reportingAgent, -2)
 			return False
 
 # Check if the suspiciousWord is on the potentialEnemy's wordlist but not the reportingAgent's.  If so, congratulate reportingAgent. If not, chide reportingAgent.  Assign points accordingly.
 def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord, language=english):
 	if reportingAgent == potentialEnemy:
-		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-même."], language = language)
+		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-meme."], language = language)
 		return False
 	if not checkFor(players, "agentNumber", potentialEnemy):
-		sendMessage(reportingAgent, ["We don't have records of an agent by that number.", "Nous n'avons pas ce numéro d'agent dans nos dossiers."], language = language)
+		sendMessage(reportingAgent, ["We don't have records of an agent by that number.", "Nous n'avons pas ce numero d'agent dans nos dossiers."], language = language)
 		return False
 	else:
 		reportingAgentList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="words")
 		potentialEnemyList = lookup(collection=players, field="agentNumber", fieldvalue=potentialEnemy, response="words")
 		previouslyReportedList = lookup(collection=players, field="agentNumber", fieldvalue=reportingAgent, response="reportedEnemyCodes")
 		if potentialEnemy+" "+suspiciousWord in previouslyReportedList:
-			sendMessage(reportingAgent, ["Your report of Agent "+potentialEnemy+"\'s use of code \""+suspiciousWord+"\" was already received.  Do not waste HQ's time with duplicate reports.", "Votre rapport sur l'Agent "+potentialEnemy+" et le code \""+suspiciousWord+"\" a déjà été reçu. Ne nous faites pas perdre du temps avec des rapports en double."], language = language)
+			sendMessage(reportingAgent, ["Your report of Agent "+potentialEnemy+"\'s use of code \""+suspiciousWord+"\" was already received.  Do not waste HQ's time with duplicate reports.", "Votre rapport sur l'Agent "+potentialEnemy+" et le code \""+suspiciousWord+"\" a deja ete recu. Ne nous faites pas perdre du temps avec des rapports en double."], language = language)
 		elif suspiciousWord in potentialEnemyList:
 			if not suspiciousWord in reportingAgentList:
-				sendMessage(reportingAgent, ["Good work! Your report of Agent "+potentialEnemy+"\'s use of code \""+suspiciousWord+"\" is valuable intel.", "Beau travail! Votre rapport sur l'Agent "+potentialEnemy+" utilisant le code  \""+suspiciousWord+"\" est un renseignement précieux."], language = language)
+				sendMessage(reportingAgent, ["Good work! Your report of Agent "+potentialEnemy+"\'s use of code \""+suspiciousWord+"\" is valuable intel.", "Beau travail! Votre rapport sur l'Agent "+potentialEnemy+" utilisant le code  \""+suspiciousWord+"\" est un renseignement precieux."], language = language)
 				addToRecord(reportingAgent, "reportedEnemyCodes", potentialEnemy+" "+suspiciousWord)
 				awardPoints(reportingAgent, 3)
 				addToRecord(potentialEnemy, "interceptedTransmits", reportingAgent+" "+suspiciousWord)
@@ -215,13 +215,13 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord, language=english
 				transcript(content="Agent "+reportingAgent+" caught Agent "+potentialEnemy+" transmitting code \""+suspiciousWord+"\"", tag="interceptedtransmit")
 				return True
 			else:
-				sendMessage(reportingAgent, ["Doesn't that word look familiar to you? If you mean to report a friendly agent, send only their agent number.", "Ce mot ne vous semble-t-il pas familier ? Si c'est pour faire un rapport d'un agent ami, envoyez juste son numéro d'agent."], language = language)
+				sendMessage(reportingAgent, ["Doesn't that word look familiar to you? If you mean to report a friendly agent, send only their agent number.", "Ce mot ne vous semble-t-il pas familier? Si c'est pour faire un rapport d'un agent ami, envoyez juste son numero d'agent."], language = language)
 				transcript(content="Agent "+reportingAgent+" reported Agent "+potentialEnemy+" for code \""+suspiciousWord+"\" but that was their own word too.", tag="interceptedfriendlytransmit")
 				return False
 		else:
 			spuriousReport(suspiciousWord)
 			addToRecord(reportingAgent, "spuriousReports", potentialEnemy+" "+suspiciousWord)
-			sendMessage(reportingAgent, ["\""+suspiciousWord+"\" does not seem to be an enemy code. Be more careful.","\""+suspiciousWord+"\" ne semble pas être un code ennemi. Soyez plus prudent."], language = language)
+			sendMessage(reportingAgent, ["\""+suspiciousWord+"\" does not seem to be an enemy code. Be more careful.","\""+suspiciousWord+"\" ne semble pas etre un code ennemi. Soyez plus prudent."], language = language)
 			awardPoints(reportingAgent, -2)
 			transcript(content="Agent "+reportingAgent+" spuriously reported Agent "+potentialEnemy+" for the code \""+suspiciousWord+"\"", tag="spuriousreport")
 			return False
@@ -242,6 +242,8 @@ def sendMessage(agentNumber, contentList, phoneNumber=None, language=english):
 			message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=fromNumber)
 	 	except twilio.TwilioRestException as e:
 	 		content = content + " WITH TWILIO ERROR: " + e
+	 	except:
+	 		print "some sort of twilio error"
 	 	if agentNumber:
 			transcript(content="Sent message to "+agentNumber+": "+content, tag="sentmessage")
 		else: 
@@ -320,7 +322,7 @@ def incomingSMSFrench():
 def leaderboard():
 	spuriousList = lookup(games, "status", "active", "spuriousReports")
 	return render_template("leaderboard.html", players = players, spuriousReports = spuriousList)
-	
+
 
 @app.route('/leatranscript', methods=['GET'])
 def showtranscript():
