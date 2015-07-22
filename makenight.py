@@ -221,7 +221,7 @@ def reportEnemy(reportingAgent, potentialEnemy, suspiciousWord, language=english
 		else:
 			spuriousReport(suspiciousWord)
 			addToRecord(reportingAgent, "spuriousReports", potentialEnemy+" "+suspiciousWord)
-			sendMessage(reportingAgent, ["\""+suspiciousWord+"\" does not seem to be an enemy code. Be more careful.","\""+suspiciousWord+"\" ne semble pas etre un code ennemi. Soyez plus prudent."], language = language)
+			sendMessage(reportingAgent, ["\""+suspiciousWord+"\" does not seem to be that enemy's code. Be more careful.","\""+suspiciousWord+"\" ne semble pas etre un code de cet ennemi. Soyez plus prudent."], language = language)
 			awardPoints(reportingAgent, -2)
 			transcript(content="Agent "+reportingAgent+" spuriously reported Agent "+potentialEnemy+" for the code \""+suspiciousWord+"\"", tag="spuriousreport")
 			return False
@@ -272,7 +272,14 @@ def awardPoints(agentNumber, pointAdjustment):
 
 # Append a spurious word onto the game's record of spurious reports.
 def spuriousReport(suspiciousWord):
-	games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
+	gameWordList = lookup(collection=games, field="status", fieldvalue="active", response="wordlists")
+	addWord = True
+	for list in gameWordList:
+		for (word in list):
+			if word == suspiciousWord:
+				addWord = False
+	if (addWord):
+		games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
 	# socketio.emit("message", {"type": "scorechange", "word": suspiciousWord})
 
 	return
