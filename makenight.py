@@ -275,14 +275,16 @@ def spuriousReport(suspiciousWord):
 	gameWordList = lookup(collection=games, field="status", fieldvalue="active", response="wordlists")
 	addWord = True
 	for list in gameWordList:
-		for (word in list):
+		for word in list:
 			if word == suspiciousWord:
 				addWord = False
 	if (addWord):
 		games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
 	# socketio.emit("message", {"type": "scorechange", "word": suspiciousWord})
-
 	return
+
+	# def lookup(collection, field, fieldvalue, response):
+	# return games.find({"status":"active"}, {"wordlists":1, "_id":0})[0]["wordlists"] 
 
 # ----------- Web --------------
 
