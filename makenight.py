@@ -11,7 +11,7 @@ import re
 import string
 # from flask_socketio import SocketIO, emit
 
-debug = False
+debug = True
 app = Flask(__name__)
 
 # socketio = SocketIO(app)
@@ -244,12 +244,13 @@ def sendMessage(agentNumber, contentList, phoneNumber=None, language=english):
 			transcript(content="Didn't send message to retired "+agentNumber+": "+content, tag="sentmessage")
 			return
 	if phoneNumber:
-		try:
-			message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=fromNumber)
-	 	except twilio.TwilioRestException as e:
-			content = content + " WITH TWILIO ERROR: " + str(e)
-	 	except:
-	 		print "some sort of twilio error"
+		if not debug:
+			try:
+				message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=fromNumber)
+		 	except twilio.TwilioRestException as e:
+				content = content + " WITH TWILIO ERROR: " + str(e)
+		 	except:
+		 		print "some sort of twilio error"
 	 	if agentNumber:
 			transcript(content="Sent message to "+agentNumber+": "+content, tag="sentmessage")
 		else: 
