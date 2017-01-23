@@ -310,7 +310,7 @@ def incomingSMS():
 	else: 
 		return "Eh?"
 
-
+# ---- Support for multiple languages using multiple Twilio incoming numbers ----
 # @app.route('/twilio_en', methods=['POST'])
 # def incomingSMSEnglish():
 # 	phoneNumber = request.form.get('From', None)
@@ -332,7 +332,7 @@ def incomingSMS():
 # 		return "Success!"
 # 	else: 
 # 		return "Eh?"
-
+# ---- /multiple languages ----
 
 @app.route('/leaderboard', methods=['GET'])
 def leaderboard():
@@ -348,19 +348,32 @@ def showtranscript():
 def console():
 	return render_template("console.html", information = transcript)
 
-# @app.route('/sockettest', methods=['GET'])
-# def testThoseSockets():
-# 	return render_template("sockettest.html")
+@app.route('/leaconsole/privatemessage', methods=['POST'])
+def PM():
+	toAgent = request.form.get('To', None)
+	message = request.form.get('Body', None)
+	# "message" is a list to preserve compatibility with multi-language support.  
+	# A TODO would be to have sendMessage accept either list or string.
+	sendMessage(toAgent, [message])
+	return "Sent \'"+message+"\' to Agent "+toAgent+".<br><a href=\"/leaconsole\">go back</a>"
 
-# @app.route('/socketsend', methods=['GET'])
-# def sendThatSocket():
-# 	print "loaded"
-# 	socketio.emit('message', "hello from a get request")
-# 	return "success"
-
-# @socketio.on('message')
-# def handle_source():
-#     socketio.emit('message', "hello from a socket event")
+@app.route('/leaconsole/broadcast', methods=['POST'])
+def broadcast():
+	content = request.form.get('Body', None)
+	fromNumber = twilioNumbers[0]
+	numberofAgents = 0
+	activeAgents = players.find({"status" : "active"})
+	for agent in activeAgents:
+		numberofAgents = numberofAgents + 1
+	 	if not debug:
+			try:
+				message = twilioclient.sms.messages.create(body=content, to=agent.phoneNumber, from_=fromNumber)
+		 	except twilio.TwilioRestException as e:
+				content = content + " WITH TWILIO ERROR: " + str(e)
+		 	except:
+		 		print "some sort of twilio error"
+	transcript(content="Broadcast message to "+str(numberofAgents)+" active agents: "+content, tag="broadcast")
+	return "Broadcast \'"+content+"\' to "+str(numberofAgents)+" active agents.<br><a href=\"/leaconsole\">go back</a>"
 
 
 #----------Jinja filter-------------------------------------------
