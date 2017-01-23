@@ -3,18 +3,19 @@
 from flask import *
 import twilio.twiml
 from twilio.rest import TwilioRestClient
-import os 
+import os
+import sys
 from pymongo import *
 import datetime
 import random
 import re
 import string
-# from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit
 
 debug = True
 app = Flask(__name__)
 
-# socketio = SocketIO(app)
+socketio = SocketIO(app)
 
 english = 0
 french = 1
@@ -31,9 +32,6 @@ twilioNumbers = [os.environ['TWILIO']]
 mynumber = os.environ['ME']
 # Init twilio
 twilioclient = TwilioRestClient(account_sid, auth_token)
-
-# Port needed for socketio
-heroku_port = os.environ['PORT']
 
 # MongoHQ account info, also from Heroku environment variables
 mongoclientURL = os.environ['MONGOHQ_URL']
@@ -153,7 +151,7 @@ def newAgent(phoneNumber, rawcontent, language):
 			})
 		success = sendMessage(agentNumber, ["Greetings, Agent "+agentNumber+"! Your code words are as follows: "+", ".join(wordlist), "Bienvenue, Agent "+agentNumber+"! Voici vos mots-code: "+", ".join(wordlist)], language = language)
 		transcript(content="New agent: "+agentNumber, tag="newagent")
-		# socketio.emit("scorechange", {"agentNumber": agentNumber, "points": 0})
+		socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": 0})
 		return
 
 def retireAgent(agentNumber, language=english):
@@ -274,7 +272,7 @@ def addToRecord(agentNumber, field, content):
 # Increments player's points by pointAdjustment
 def awardPoints(agentNumber, pointAdjustment):
 	players.update({"agentNumber":agentNumber}, {"$inc":{"points":pointAdjustment}})
-	# socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": pointAdjustment})
+	socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": pointAdjustment})
 	return
 
 # Append a spurious word onto the game's record of spurious reports.
@@ -287,7 +285,7 @@ def spuriousReport(suspiciousWord):
 				addWord = False
 	if (addWord):
 		games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
-	# socketio.emit("message", {"type": "scorechange", "word": suspiciousWord})
+		socketio.emit("message", {"type": "spurious", "word": suspiciousWord})
 	return
 
 	# def lookup(collection, field, fieldvalue, response):
@@ -375,6 +373,20 @@ def broadcast():
 	transcript(content="Broadcast message to "+str(numberofAgents)+" active agents: "+content, tag="broadcast")
 	return "Broadcast \'"+content+"\' to "+str(numberofAgents)+" active agents.<br><a href=\"/leaconsole\">go back</a>"
 
+@app.route('/sockettest', methods=['GET'])
+def testThoseSockets():
+        return render_template("sockettest.html")
+
+# @app.route('/socketsend', methods=['GET'])
+# def sendThatSocket():
+# 	print "loaded"
+# 	socketio.emit('message', "hello from a get request")
+# 	return "success"
+
+@socketio.on('message')
+def handle_source():
+	socketio.emit('message', "hello from a socket event")
+
 
 #----------Jinja filter-------------------------------------------
 @app.template_filter('printtime')
@@ -384,10 +396,12 @@ def timeToString(timestamp):
 
 #-----------Run it!----------------------------------------------
 
-if __name__ == "__main__":
-	print "running the app"
-	app.run(debug=debug)
-	# socketio.run(app, port=heroku_port)
+# (apparently this isn't necessary when running through gunicorn?!
+#if __name__ == "__main__":
+	#print "running the app"
+	#print >> sys.stderr, 'RUNNING THE APP'
+	#app.run(debug=debug)
+	#socketio.run(app)
 
 # TODO
 # sweet websocket leaderboard

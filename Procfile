@@ -1,1 +1,1 @@
-web: gunicorn makenight:app
+web: gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 makenight:app

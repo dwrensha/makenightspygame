@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="refresh" content="1">
+	<script src="//cdn.socket.io/socket.io-1.4.5.js"></script>
 	<style type="text/css">
-		
 		body {
 			font-family: Courier;
 			margin:3em;
@@ -87,43 +86,31 @@
 
 	window.onload = renderBoard;
 
-	// window.onload = function() {
-	// 	renderBoard();
-	// 	var ws = io.connect();
+	window.onload = function() {
+		renderBoard();
+		var ws = io.connect();
 
-	// 	ws.on('message', function(data) {
-	// 		console.log(data);
-	// 		if(data.type == "scorechange") {
-	// 			var agentNumber = data.agentNumber;
-	// 			if (players[agentNumber]) {
-	// 				var newPoints = players[agentNumber] + data.points;
-	// 				players[agentNumber] = newPoints;
-	// 			}
-	// 			else {
-	// 				players[agentNumber] = 0;
-	// 			}
-	// 			renderBoard();
-	// 		}
-	// 		else if (data.type == "spurious") {
-	// 			console.log("new spurious report: "+data.word);
-	// 			var span = document.createElement('span');
-	// 			span.className = "report";
-	// 			span.innerHTML = data.word;
-	// 			document.querySelector('.spurious').appendChild(span);
-	// 		}
+		ws.on('message', function(data) {
+			console.log(data);
+			if(data.type == "scorechange") {
+				var agentNumber = data.agentNumber;
+				if (!players[agentNumber]) {
+					players[agentNumber] = 0;
+				}
+				var newPoints = players[agentNumber] + data.points;
+				players[agentNumber] = newPoints;
+				renderBoard();
+			}
+			else if (data.type == "spurious") {
+				console.log("new spurious report: "+data.word);
+				var span = document.createElement('span');
+				span.className = "report";
+				span.innerHTML = " " + data.word + " ";
+				document.querySelector('.spurious').appendChild(span);
+			}
 
-	// 	});
-	// }
-
-	
-
-	// ws.on('spurious', function(data) {
-	//     console.log("new spurious report: "+data);
-	//     var span = document.createElement('span');
-	//     span.className = "report";
-	//     span.innerHTML = data;
-	//     document.querySelector('.spurious').appendChild(span);
-	// });
+		});
+	};
 
 	</script>
 </head>
