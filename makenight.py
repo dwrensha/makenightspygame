@@ -24,7 +24,10 @@ french = 1
 account_sid = os.environ['ACCOUNT_SID'] 
 auth_token = os.environ['AUTH_TOKEN']
 twilionumber = os.environ['TWILIO']
-twilioNumbers = [os.environ['TWILIO_EN'], os.environ['TWILIO_FR']]
+# twilioNumbers = [os.environ['TWILIO_EN'], os.environ['TWILIO_FR']]
+twilioNumbers = [os.environ['TWILIO']]
+# twilioNumbers is an array to allow for different outgoing numbers for multiple-language support
+# (different languages are accessed by the player via different phone numbers; we respond via the same number they used.)
 mynumber = os.environ['ME']
 # Init twilio
 twilioclient = TwilioRestClient(account_sid, auth_token)
@@ -304,27 +307,27 @@ def incomingSMS():
 		return "Eh?"
 
 
-@app.route('/twilio_en', methods=['POST'])
-def incomingSMSEnglish():
-	phoneNumber = request.form.get('From', None)
-	content = request.form.get('Body', None)
-	# socketio.emit('message', content)
-	if phoneNumber and content:
-		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = english)
-		return "Success!"
-	else: 
-		return "Eh?"
+# @app.route('/twilio_en', methods=['POST'])
+# def incomingSMSEnglish():
+# 	phoneNumber = request.form.get('From', None)
+# 	content = request.form.get('Body', None)
+# 	# socketio.emit('message', content)
+# 	if phoneNumber and content:
+# 		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = english)
+# 		return "Success!"
+# 	else: 
+# 		return "Eh?"
 
-@app.route('/twilio_fr', methods=['POST'])
-def incomingSMSFrench():
-	phoneNumber = request.form.get('From', None)
-	content = request.form.get('Body', None)
-	# socketio.emit('message', content)
-	if phoneNumber and content:
-		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = french)
-		return "Success!"
-	else: 
-		return "Eh?"
+# @app.route('/twilio_fr', methods=['POST'])
+# def incomingSMSFrench():
+# 	phoneNumber = request.form.get('From', None)
+# 	content = request.form.get('Body', None)
+# 	# socketio.emit('message', content)
+# 	if phoneNumber and content:
+# 		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = french)
+# 		return "Success!"
+# 	else: 
+# 		return "Eh?"
 
 
 @app.route('/leaderboard', methods=['GET'])
@@ -366,7 +369,10 @@ if __name__ == "__main__":
 	# socketio.run(app, port=heroku_port)
 
 # TODO
-# re-join the game? No, I will do this by hand if it's necessary
-# don't let people report themselves (DONE)
-# spaces at the beginning of texts
 # sweet websocket leaderboard
+# "score" command for players (returns txt with their score and current high score)
+# console features for Lea, in descending importance:
+	# removing bad words from leaderboard
+	# broadcasting
+	# modifying player accounts
+	# notifying single players 
