@@ -67,6 +67,9 @@ def isAgentNumber(word):
 # Anything else should respond with a help message
 
 def gameLogic(phoneNumber, rawcontent, language = 0):
+	if not checkFor(games, "active", "true"):
+		transcript(content="No active game; received \'"+rawcontent+"\' from phone number: "+phoneNumber, tag="parsererror")
+		break
 	agentNumber = getAgentNumber(phoneNumber)
 	# unrecognized number should create a new agent, getting agentName from content
 	if not agentNumber:
@@ -339,6 +342,10 @@ def leaderboard():
 @app.route('/leatranscript', methods=['GET'])
 def showtranscript():
 	return render_template("transcript.html", information = transcripts)
+
+@app.route('/leaconsole', methods=['GET'])
+def console():
+	return render_template("console.html", information = transcript)
 
 # @app.route('/sockettest', methods=['GET'])
 # def testThoseSockets():
