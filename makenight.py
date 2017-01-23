@@ -65,7 +65,7 @@ def isAgentNumber(word):
 # Anything else should respond with a help message
 
 def gameLogic(phoneNumber, rawcontent, language = 0):
-	if not checkFor(games, "active", "true"):
+	if not checkFor(games, "status", "active"):
 		transcript(content="No active game; received \'"+rawcontent+"\' from phone number: "+phoneNumber, tag="parsererror")
 		return
 	agentNumber = getAgentNumber(phoneNumber)
