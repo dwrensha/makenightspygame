@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<title>Leaderboard</title>
 	<script src="//cdn.socket.io/socket.io-1.4.5.js"></script>
 	<style type="text/css">
 		body {
@@ -72,8 +73,8 @@
 		newScoreboard.className = "scoreboard";
 		var agentHeader = document.createElement('span');
 		agentHeader.className = "agent";
-			agentHeader.innerHTML = "<em>Agent: Score</em>";
-			newScoreboard.appendChild(agentHeader);
+		agentHeader.innerHTML = "<em>Agent: Score</em>";
+		newScoreboard.appendChild(agentHeader);
 		for (var i = 0; i < sortablePlayers.length; i++) {
 			var span = document.createElement('span');
 			span.className = "agent";
@@ -84,10 +85,30 @@
 		oldScoreboard.parentElement.replaceChild(newScoreboard, oldScoreboard);
 	}
 
-	window.onload = renderBoard;
+	var spuriousWords = [
+		{% for item in spuriousReports %} "{{ item }}", {% endfor %}];
+
+	function renderSpuriousReports() {
+		var newWordList = document.createElement('div');
+		newWordList.className = "spurious";
+		var spuriousHeader = document.createElement('h1');
+		spuriousHeader.innerHTML = "Spurious Reports:";
+		newWordList.appendChild(spuriousHeader);
+
+		for (var idx = 0; idx < spuriousWords.length; ++idx) {
+			var word = spuriousWords[spuriousWords.length - 1 - idx];
+			var span = document.createElement('span');
+			span.className = "report";
+			span.innerHTML = " " + word + " ";
+			newWordList.appendChild(span);
+		}
+		var oldWordList = document.querySelector('.spurious');
+		oldWordList.parentElement.replaceChild(newWordList, oldWordList);
+	}
 
 	window.onload = function() {
 		renderBoard();
+		renderSpuriousReports();
 		var ws = io.connect();
 
 		ws.on('message', function(data) {
@@ -102,11 +123,9 @@
 				renderBoard();
 			}
 			else if (data.type == "spurious") {
-				console.log("new spurious report: "+data.word);
-				var span = document.createElement('span');
-				span.className = "report";
-				span.innerHTML = " " + data.word + " ";
-				document.querySelector('.spurious').appendChild(span);
+				console.log("new spurious report: " + data.word);
+				spuriousWords.push(data.word);
+				renderSpuriousReports();
 			}
 
 		});
@@ -117,11 +136,8 @@
 <body>
 	<div class="headline"><h1>Secret Agent High Scores!</h2></div>
 	<div class="scoreboard">
-
 	</div>
 	<div class="spurious">
-		<h1>Spurious Reports:</h1>
-		{% for item in spuriousReports|reverse %}<span class="report">{{ item }}</span> {% endfor %}
 	</div>
 </body>
 </html>
