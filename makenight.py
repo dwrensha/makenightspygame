@@ -69,7 +69,7 @@ def isAgentNumber(word):
 def gameLogic(phoneNumber, rawcontent, language = 0):
 	if not checkFor(games, "active", "true"):
 		transcript(content="No active game; received \'"+rawcontent+"\' from phone number: "+phoneNumber, tag="parsererror")
-		break
+		return
 	agentNumber = getAgentNumber(phoneNumber)
 	# unrecognized number should create a new agent, getting agentName from content
 	if not agentNumber:
