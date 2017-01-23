@@ -3,18 +3,19 @@
 from flask import *
 import twilio.twiml
 from twilio.rest import TwilioRestClient
-import os 
+import os
+import sys
 from pymongo import *
 import datetime
 import random
 import re
 import string
-# from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit
 
 debug = True
 app = Flask(__name__)
 
-# socketio = SocketIO(app)
+socketio = SocketIO(app)
 
 english = 0
 french = 1
@@ -31,9 +32,6 @@ twilioNumbers = [os.environ['TWILIO']]
 mynumber = os.environ['ME']
 # Init twilio
 twilioclient = TwilioRestClient(account_sid, auth_token)
-
-# Port needed for socketio
-heroku_port = os.environ['PORT']
 
 # MongoHQ account info, also from Heroku environment variables
 mongoclientURL = os.environ['MONGOHQ_URL']
@@ -348,9 +346,9 @@ def showtranscript():
 def console():
 	return render_template("console.html", information = transcript)
 
-# @app.route('/sockettest', methods=['GET'])
-# def testThoseSockets():
-# 	return render_template("sockettest.html")
+@app.route('/sockettest', methods=['GET'])
+def testThoseSockets():
+        return render_template("sockettest.html")
 
 # @app.route('/socketsend', methods=['GET'])
 # def sendThatSocket():
@@ -358,10 +356,9 @@ def console():
 # 	socketio.emit('message', "hello from a get request")
 # 	return "success"
 
-# @socketio.on('message')
-# def handle_source():
-#     socketio.emit('message', "hello from a socket event")
-
+@socketio.on('message')
+def handle_source():
+	socketio.emit('message', "hello from a socket event")
 
 #----------Jinja filter-------------------------------------------
 @app.template_filter('printtime')
@@ -371,10 +368,12 @@ def timeToString(timestamp):
 
 #-----------Run it!----------------------------------------------
 
-if __name__ == "__main__":
-	print "running the app"
-	app.run(debug=debug)
-	# socketio.run(app, port=heroku_port)
+# (apparently this isn't necessary when running through gunicorn?!
+#if __name__ == "__main__":
+	#print "running the app"
+	#print >> sys.stderr, 'RUNNING THE APP'
+	#app.run(debug=debug)
+	#socketio.run(app)
 
 # TODO
 # sweet websocket leaderboard
