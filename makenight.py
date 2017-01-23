@@ -241,7 +241,7 @@ def sendMessage(agentNumber, contentList, phoneNumber=None, language=english):
 		try:
 			message = twilioclient.sms.messages.create(body=content, to=phoneNumber, from_=fromNumber)
 	 	except twilio.TwilioRestException as e:
-	 		content = content + " WITH TWILIO ERROR: " + e
+			content = content + " WITH TWILIO ERROR: " + str(e)
 	 	except:
 	 		print "some sort of twilio error"
 	 	if agentNumber:
