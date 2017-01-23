@@ -151,7 +151,7 @@ def newAgent(phoneNumber, rawcontent, language):
 			})
 		success = sendMessage(agentNumber, ["Greetings, Agent "+agentNumber+"! Your code words are as follows: "+", ".join(wordlist), "Bienvenue, Agent "+agentNumber+"! Voici vos mots-code: "+", ".join(wordlist)], language = language)
 		transcript(content="New agent: "+agentNumber, tag="newagent")
-		# socketio.emit("scorechange", {"agentNumber": agentNumber, "points": 0})
+		socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": 0})
 		return
 
 def retireAgent(agentNumber, language=english):
@@ -272,7 +272,7 @@ def addToRecord(agentNumber, field, content):
 # Increments player's points by pointAdjustment
 def awardPoints(agentNumber, pointAdjustment):
 	players.update({"agentNumber":agentNumber}, {"$inc":{"points":pointAdjustment}})
-	# socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": pointAdjustment})
+	socketio.emit("message", {"type": "scorechange", "agentNumber": agentNumber, "points": pointAdjustment})
 	return
 
 # Append a spurious word onto the game's record of spurious reports.
@@ -285,7 +285,7 @@ def spuriousReport(suspiciousWord):
 				addWord = False
 	if (addWord):
 		games.update({"status":"active"}, {"$push":{"spuriousReports":suspiciousWord}})
-	# socketio.emit("message", {"type": "scorechange", "word": suspiciousWord})
+		socketio.emit("message", {"type": "spurious", "word": suspiciousWord})
 	return
 
 	# def lookup(collection, field, fieldvalue, response):
