@@ -127,7 +127,9 @@
 				spuriousWords.push(data.word);
 				renderSpuriousReports();
 			}
-
+			else if (data.type == "refresh") {
+				location.reload(true);
+			}
 		});
 	};
 
