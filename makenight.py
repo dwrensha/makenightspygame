@@ -264,7 +264,8 @@ def sendMessage(agentNumber, contentList, phoneNumber=None, language=english):
 def transcript(content, tag):
 	time = datetime.datetime.now()
 	transcripts.insert({"time":time, "tag":tag, "content":content})
-	# socketio.emit('transcript', {"time":time, "tag":tag, "content":content})
+	formattedTime = str(time)[11:16]
+	socketio.emit('message', {"type":"transcript", "time":formattedTime, "tag":tag, "content":content})
 	print content
 	return
 
