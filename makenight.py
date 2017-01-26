@@ -373,6 +373,7 @@ def showtranscript():
 		return render_template("transcript.html", information = transcripts)
 
 @app.route('/leaconsole', methods=['GET'])
+@requires_auth
 def console():
 	return render_template("console.html", information = transcript)
 
