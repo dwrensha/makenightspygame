@@ -11,6 +11,7 @@ import random
 import re
 import string
 from flask_socketio import SocketIO, emit
+from functools import wraps
 
 debug = True
 app = Flask(__name__)
@@ -44,7 +45,7 @@ players = database["players"]	#loads or makes the collection, whichever should h
 transcripts = database["transcript"]
 games = database["games"]
 
-# Init password for console
+# Init password for console and transcript
 password = os.environ['PW']
 
 # ----------- Helpers --------------
@@ -294,6 +295,31 @@ def spuriousReport(suspiciousWord):
 	# def lookup(collection, field, fieldvalue, response):
 	# return games.find({"status":"active"}, {"wordlists":1, "_id":0})[0]["wordlists"] 
 
+# --------- Auth? --------------
+def check_auth(username, pw):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    return pw == password
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+
+
 # ----------- Web --------------
 
 @app.route('/', methods=['GET'])
@@ -342,8 +368,9 @@ def leaderboard():
 
 
 @app.route('/leatranscript', methods=['GET'])
+@requires_auth
 def showtranscript():
-	return render_template("transcript.html", information = transcripts)
+		return render_template("transcript.html", information = transcripts)
 
 @app.route('/leaconsole', methods=['GET'])
 def console():
