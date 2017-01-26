@@ -172,6 +172,7 @@ def parserError(agentNumber, rawcontent, language=english):
 def reportFriend(reportingAgent, potentialFriend, language=english):
 	if reportingAgent == potentialFriend:
 		sendMessage(reportingAgent, ["Please don't waste HQ's time by reporting yourself.", "Merci de ne pas nous faire perdre notre temps en vous identifiant vous-meme."], language = language)
+		return False
 	if not checkFor(players, "agentNumber", potentialFriend):
 		sendMessage(reportingAgent, ["We don't have records of an agent by that number.", "Nous n'avons pas ce numero d'agent dans nos dossiers."], language = language)
 	else:
@@ -449,10 +450,7 @@ def timeToString(timestamp):
 	#socketio.run(app)
 
 # TODO
-# sweet websocket leaderboard
 # "score" command for players (returns txt with their score and current high score)
 # console features for Lea, in descending importance:
 	# removing bad words from leaderboard
-	# broadcasting
 	# modifying player accounts
-	# notifying single players 
