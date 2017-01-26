@@ -334,7 +334,7 @@ def incomingSMS():
 	# socketio.emit('message', content)
 	if phoneNumber and content:
 		gameLogic(phoneNumber = phoneNumber, rawcontent = content, language = english)
-		return "Success!"
+		return Response('', 204, {})
 	else: 
 		return "Eh?"
 
