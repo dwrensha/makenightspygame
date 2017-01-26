@@ -44,6 +44,9 @@ players = database["players"]	#loads or makes the collection, whichever should h
 transcripts = database["transcript"]
 games = database["games"]
 
+# Init password for console
+password = os.environ['PW']
+
 # ----------- Helpers --------------
 # Find the first entry in the collection with the "field" field containing fieldvalue. Return the value of the field named in "response."
 def lookup(collection, field, fieldvalue, response):
@@ -348,12 +351,16 @@ def console():
 
 @app.route('/leaconsole/privatemessage', methods=['POST'])
 def PM():
-	toAgent = request.form.get('To', None)
-	message = request.form.get('Body', None)
-	# "message" is a list to preserve compatibility with multi-language support.  
-	# A TODO would be to have sendMessage accept either list or string.
-	sendMessage(toAgent, [message])
-	return "Sent \'"+message+"\' to Agent "+toAgent+".<br><a href=\"/leaconsole\">go back</a>"
+	pw = request.form.get('pw', None)
+	if (pw == password):
+		toAgent = request.form.get('To', None)
+		message = request.form.get('Body', None)
+		# "message" is a list to preserve compatibility with multi-language support.  
+		# A TODO would be to have sendMessage accept either list or string.
+		sendMessage(toAgent, [message])
+		return "Sent \'"+message+"\' to Agent "+toAgent+".<br><a href=\"/leaconsole\">go back</a>"
+	else:
+		return "Incorrect password.<br><a href=\"/leaconsole\">go back</a>"
 
 @app.route('/leaconsole/refreshwordlist', methods=['GET'])
 def refresh():
@@ -362,21 +369,25 @@ def refresh():
 
 @app.route('/leaconsole/broadcast', methods=['POST'])
 def broadcast():
-	content = request.form.get('Body', None)
-	fromNumber = twilioNumbers[0]
-	numberofAgents = 0
-	activeAgents = players.find({"status" : "active"})
-	for agent in activeAgents:
-		numberofAgents = numberofAgents + 1
-	 	if not debug:
-			try:
-				message = twilioclient.sms.messages.create(body=content, to=agent.phoneNumber, from_=fromNumber)
-		 	except twilio.TwilioRestException as e:
-				content = content + " WITH TWILIO ERROR: " + str(e)
-		 	except:
-		 		print "some sort of twilio error"
-	transcript(content="Broadcast message to "+str(numberofAgents)+" active agents: "+content, tag="broadcast")
-	return "Broadcast \'"+content+"\' to "+str(numberofAgents)+" active agents.<br><a href=\"/leaconsole\">go back</a>"
+	pw = request.form.get('pw', None)
+	if (pw == password):
+		content = request.form.get('Body', None)
+		fromNumber = twilioNumbers[0]
+		numberofAgents = 0
+		activeAgents = players.find({"status" : "active"})
+		for agent in activeAgents:
+			numberofAgents = numberofAgents + 1
+		 	if not debug:
+				try:
+					message = twilioclient.sms.messages.create(body=content, to=agent.phoneNumber, from_=fromNumber)
+			 	except twilio.TwilioRestException as e:
+					content = content + " WITH TWILIO ERROR: " + str(e)
+			 	except:
+			 		print "some sort of twilio error"
+		transcript(content="Broadcast message to "+str(numberofAgents)+" active agents: "+content, tag="broadcast")
+		return "Broadcast \'"+content+"\' to "+str(numberofAgents)+" active agents.<br><a href=\"/leaconsole\">go back</a>"
+	else:
+		return "Incorrect password.<br><a href=\"/leaconsole\">go back</a>"
 
 @app.route('/sockettest', methods=['GET'])
 def testThoseSockets():

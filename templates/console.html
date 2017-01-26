@@ -1,11 +1,13 @@
 <form action="/leaconsole/privatemessage" method="post">
 To: <input type="text" name="To" />
-Content: <input type="text" name="Body"  value="Message from Q: "/>
+Content: <input type="text" name="Body"  value="Message from Q: "/><br>
+PW: <input type="password" name="pw"/>
 <input type="submit">
 </form>
 <hr>
 <form action="/leaconsole/broadcast" method="post" onsubmit="return confirm('Broadcast to all active players?');">
-Broadcast: <input type="text" name="Body"  value="Message from Q: "/>
+Broadcast: <input type="text" name="Body"  value="Message from Q: "/><br>
+PW: <input type="password" name="pw"/>
 <input type="submit">
 </form>
 <hr>
