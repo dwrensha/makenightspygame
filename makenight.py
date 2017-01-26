@@ -13,7 +13,7 @@ import string
 from flask_socketio import SocketIO, emit
 from functools import wraps
 
-debug = True
+debug = False
 app = Flask(__name__)
 
 socketio = SocketIO(app)
