@@ -355,6 +355,11 @@ def PM():
 	sendMessage(toAgent, [message])
 	return "Sent \'"+message+"\' to Agent "+toAgent+".<br><a href=\"/leaconsole\">go back</a>"
 
+@app.route('/leaconsole/refreshwordlist', methods=['GET'])
+def refresh():
+	socketio.emit("message", {"type": "refresh"})
+	return "Refreshed.<br><a href=\"/leaconsole\">go back</a>"
+
 @app.route('/leaconsole/broadcast', methods=['POST'])
 def broadcast():
 	content = request.form.get('Body', None)
